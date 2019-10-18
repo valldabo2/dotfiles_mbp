@@ -1,3 +1,14 @@
+export TERM="xterm-256color"
+
+# For pdf-tools in spacemacs
+# https://github.com/politza/pdf-tools
+export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+
+#Inserted in bash when laptop received
+# export http_proxy=localhost:3128
+# export https_proxy=localhost:3128
+
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -83,7 +94,7 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=60'
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git vi-mode zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf)
+plugins=(git vi-mode git-flow zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -128,6 +139,10 @@ source $ZSH/oh-my-zsh.sh
 # fi
 # unset __conda_setup
 # # <<< conda initialize <<<
+
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
 export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+eval "$(pyenv init - zsh)"
+eval "$(pyenv virtualenv-init - zsh)"

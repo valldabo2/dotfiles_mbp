@@ -30,7 +30,7 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(haskell
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -42,10 +42,17 @@ values."
      emacs-lisp
      git
      markdown
-     org
+     (org :variables
+          org-enable-reveal-js-support t
+          org-projectile-file "TODO.org"
+          org-enable-github-support t
+          )
+     bibtex
+     latex
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
+     shell
      spell-checking
      syntax-checking
      version-control
@@ -63,14 +70,18 @@ values."
      templates
      html
      pandoc
+     latex
      themes-megapack
      (treemacs :variables treemacs-use-follow-mode t)
+     plantuml
+     shell
+     pdf
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(sphinx-doc)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -142,8 +153,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(solarized-dark
-                         spacemacs-dark
+   dotspacemacs-themes '(spacemacs-dark
                          spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -309,6 +319,9 @@ values."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
+
+   ;; (add-to-list 'exec-path "/Library/TeX/texbin/pdflatex")
+
    ))
 
 (defun dotspacemacs/user-init ()
@@ -318,6 +331,15 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+
+  (setenv "PKG_CONFIG_PATH" (concat (shell-command-to-string "printf %s \"$(brew --prefix libffi)\"") "/lib/pkgconfig/"))
+  ;; PDF-tools
+  ;; (setenv "PKG_CONFIG_PATH" "/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig")
+
+  (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "/Library/TeX/texbin/pdflatex")))
+  ;; (setq exec-path (append exec-path '("/Library/TeX/texbin/pdflatex")))
+  ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/pdflatex"))
+
   )
 
 (defun dotspacemacs/user-config ()
@@ -328,10 +350,27 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  ;; Set text scaling keys
-  (global-set-key (kbd "C-+") 'text-scale-increase)
-  (global-set-key (kbd "C--") 'text-scale-decrease)
+  (add-hook 'python-mode-hook (lambda ()
+                                (require 'sphinx-doc)
+                                (sphinx-doc-mode t)))
 
+  (spacemacs/toggle-truncate-lines-on)
+  ;; Visual line navigation for textual modes
+  (add-hook 'text-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+
+  (setq plantuml-default-exec-mode 'jar)
+  (setq plantuml-jar-path (expand-file-name "~/plantuml.jar"))
+
+  ;; Does not work yet
+  ;; (setq org-reveal-root "file:///Users/bd92eu/Documents/Extra/reveal.js")
+
+  ;; Set text scaling keys
+  ;; (global-set-key (kbd "C-+") 'text-scale-increase)
+  ;; (global-set-key (kbd "C--") 'text-scale-decrease)
+
+  (setq org-ref-default-bibliography '("~/Dropbox/DropsyncFiles/references.bib")
+        org-ref-pdf-directory "~/Dropbox/DropsyncFiles/Papers/"
+        org-ref-bibliography-notes "~/Dropbox/DropsyncFiles/notes.org")
   ;; ORG
   (with-eval-after-load 'org
     (setq org-capture-templates '
@@ -428,8 +467,13 @@ SCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")
             )
           )
   )
+  ;; (with-eval-after-load 'org-agenda
+  ;;   (require 'org-projectile)
+  ;;   (push (org-projectile:todo-files) org-agenda-files))
   ;; ORG
 
+  ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/pdflatex"))
+  ;; (setq exec-path (append exec-path '(":/Library/TeX/texbin/pdflatex")))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -460,7 +504,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (dockerfile-mode docker json-mode tablist docker-tramp json-snatcher json-reformat ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (sphinx-doc ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
