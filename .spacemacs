@@ -30,7 +30,8 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(haskell
+   '(sql
+     haskell
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -52,7 +53,6 @@ values."
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     shell
      spell-checking
      syntax-checking
      version-control
@@ -71,17 +71,19 @@ values."
      html
      pandoc
      latex
-     themes-megapack
+     ;; themes-megapack
      (treemacs :variables treemacs-use-follow-mode t)
      plantuml
      shell
-     pdf
+     ;; brew install pdf-tools, brew update pdf-tools
+     (pdf :variables pdf-info-epdfinfo-program "/usr/local/bin/epdfinfo"
+          pdf-tools-handle-upgrades nil)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(sphinx-doc)
+   dotspacemacs-additional-packages '(sphinx-doc org-pdfview)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -268,7 +270,7 @@ values."
    ;; If non nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
-   dotspacemacs-mode-line-unicode-symbols t
+   dotspacemacs-mode-line-unicode-symbols nil
    dotspacemacs-mode-line-theme 'spacemacs
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters point
@@ -319,9 +321,6 @@ values."
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
    dotspacemacs-whitespace-cleanup nil
-
-   ;; (add-to-list 'exec-path "/Library/TeX/texbin/pdflatex")
-
    ))
 
 (defun dotspacemacs/user-init ()
@@ -334,9 +333,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   (setenv "PKG_CONFIG_PATH" (concat (shell-command-to-string "printf %s \"$(brew --prefix libffi)\"") "/lib/pkgconfig/"))
   ;; PDF-tools
-  ;; (setenv "PKG_CONFIG_PATH" "/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig")
+  (setenv "PKG_CONFIG_PATH" "/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig")
 
-  (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "/Library/TeX/texbin/pdflatex")))
+  ;; (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "/Library/TeX/texbin/pdflatex")))
   ;; (setq exec-path (append exec-path '("/Library/TeX/texbin/pdflatex")))
   ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/pdflatex"))
 
@@ -373,6 +372,7 @@ you should place your code here."
         org-ref-bibliography-notes "~/Dropbox/DropsyncFiles/notes.org")
   ;; ORG
   (with-eval-after-load 'org
+
     (setq org-capture-templates '
 (("t" "todo" entry
   (file "~/Dropbox/org/inbox.org")
@@ -466,6 +466,15 @@ SCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")
              )
             )
           )
+
+    ;; https://emacs.stackexchange.com/questions/19686/how-to-use-pdf-tools-pdf-view-mode-in-emacs
+    ;; (use-package org-pdfview :after org)
+    ;; (eval-after-load 'org
+    (require 'org-pdfview)
+    (add-to-list 'org-file-apps
+                 '("\\.pdf\\'" . (lambda (file link)
+                                   (org-pdfview-open link))))
+    ;; )
   )
   ;; (with-eval-after-load 'org-agenda
   ;;   (require 'org-projectile)
@@ -474,6 +483,11 @@ SCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")
 
   ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/pdflatex"))
   ;; (setq exec-path (append exec-path '(":/Library/TeX/texbin/pdflatex")))
+  ;; (setq org-pandoc-options-for-latex-pdf '((pdf-engine . "/Library/TeX/texbin/pdflatex")))
+  ;; (setq exec-path (append exec-path '("/Library/TeX/texbin/pdflatex")))
+  ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/pdflatex"))
+
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -504,7 +518,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (sphinx-doc ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (org-pdfview ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

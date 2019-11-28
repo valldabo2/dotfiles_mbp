@@ -1,12 +1,8 @@
 export TERM="xterm-256color"
 
-# For pdf-tools in spacemacs
-# https://github.com/politza/pdf-tools
-export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
-
 #Inserted in bash when laptop received
-# export http_proxy=localhost:3128
-# export https_proxy=localhost:3128
+export http_proxy=localhost:3128
+export https_proxy=localhost:3128
 
 
 # If you come from bash you might have to change your $PATH.
@@ -146,3 +142,12 @@ eval "$(jenv init -)"
 export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
 eval "$(pyenv init - zsh)"
 eval "$(pyenv virtualenv-init - zsh)"
+
+# export PKG_CONFIG_PATH="/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig"
+
+# export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
+# export PATH=/usr/local/bin/autoconf:$PATH
+
+# For pdf-tools in spacemacs
+# https://github.com/politza/pdf-tools
+export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
