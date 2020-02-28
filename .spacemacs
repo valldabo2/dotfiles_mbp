@@ -30,7 +30,8 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(sql
+   '(vimscript
+     sql
      haskell
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -349,6 +350,8 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "Tw" 'org-table-toggle-column-width)
+
   (add-hook 'python-mode-hook (lambda ()
                                 (require 'sphinx-doc)
                                 (sphinx-doc-mode t)))
@@ -375,44 +378,44 @@ you should place your code here."
 
     (setq org-capture-templates '
 (("t" "todo" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* TODO %?
 %U
 %a
 " :clock-in t :clock-resume t)
  ("r" "respond" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* NEXT Respond to %:from on %:subject
 SCHEDULED: %t
 %U
 %a
 " :clock-in t :clock-resume t :immediate-finish t)
  ("n" "note" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* %? :NOTE:
 %U
 %a
 " :clock-in t :clock-resume t)
  ("j" "Journal" entry
-  (file+datetree "~/Dropbox/org/diary.org")
+  (file+datetree "~/Dropbox/org/gtd/diary.org")
   "* %?
 %U
 " :clock-in t :clock-resume t)
  ("w" "org-protocol" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* TODO Review %c
 %U
 " :immediate-finish t)
  ("m" "Meeting" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* MEETING with %? :MEETING:
 %U" :clock-in t :clock-resume t)
  ("p" "Phone call" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* PHONE %? :PHONE:
 %U" :clock-in t :clock-resume t)
  ("h" "Habit" entry
-  (file "~/Dropbox/org/inbox.org")
+  (file "~/Dropbox/org/gtd/inbox.org")
   "* NEXT %?
 %U
 %a
@@ -424,13 +427,13 @@ SCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")
 "))
 )
 
-    (setq org-agenda-files '("~/Dropbox/org/inbox.org"
-                             "~/Dropbox/org/gtd.org"
-                             "~/Dropbox/org/someday.org"))
+    (setq org-agenda-files '("~/Dropbox/org/gtd/inbox.org"
+                             "~/Dropbox/org/gtd/gtd.org"
+                             "~/Dropbox/org/gtd/someday.org"))
 
     (setq org-refile-targets '((nil :maxlevel . 9)
                                (org-agenda-files :maxlevel . 9)
-                               ("~/Dropbox/org/archive.org" :maxlevel . 1))
+                               ("~/Dropbox/org/gtd/archive.org" :maxlevel . 1))
           )
 
     (setq org-agenda-start-on-weekday nil)
@@ -447,14 +450,14 @@ SCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")
              "W" "Work"
              (
               (agenda "" ((org-agenda-span 1)))
-              (tags-todo "@work" ((org-agenda-files '("~/Dropbox/org/gtd.org") )) )
+              (tags-todo "@work" ((org-agenda-files '("~/Dropbox/org/gtd/gtd.org") )) )
               )
              )
             (
              "H" "Home"
              (
               (agenda "" ((org-agenda-span 1)))
-              (tags-todo "@private" ((org-agenda '("~/Dropbox/org/gtd.org"))) )
+              (tags-todo "@private" ((org-agenda '("~/Dropbox/org/gtd/gtd.org"))) )
               )
              )
             ("A" todo "DONE"
@@ -518,7 +521,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-pdfview ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (vimrc-mode helm-gtags ggtags dactyl-mode counsel-gtags counsel swiper ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

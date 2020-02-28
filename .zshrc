@@ -1,3 +1,5 @@
+# Aliases
+alias spacemacsclient="emacsclient -c"
 export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
