@@ -350,7 +350,7 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  (plist-put org-format-latex-options :scale 1.5)
+  
 
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "Tw" 'org-table-toggle-column-width)
 
@@ -377,6 +377,7 @@ you should place your code here."
         org-ref-bibliography-notes "~/Dropbox/DropsyncFiles/notes.org")
   ;; ORG
   (with-eval-after-load 'org
+    (plist-put org-format-latex-options :scale 1.5)
 
     (setq org-capture-templates '
 (("t" "todo" entry

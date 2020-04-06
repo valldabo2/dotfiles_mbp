@@ -3,8 +3,8 @@ alias spacemacsclient="emacsclient -c"
 export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
-export http_proxy=localhost:3128
-export https_proxy=localhost:3128
+# export http_proxy=localhost:3128
+# export https_proxy=localhost:3128
 
 
 # If you come from bash you might have to change your $PATH.
