@@ -1,0 +1,339 @@
+#+PROPERTY: results none
+Doesnt work
+
+Inspiration
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
+https://github.com/vidjuheffex/dotemacs/blob/master/emacs.org
+https://jamiecollinson.com/blog/my-emacs-config/
+
+* TODO
+** Better keybindings
+   https://github.com/emacs-evil/evil-collection
+
+* General settings
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode)
+
+(dolist (hook '(text-mode-hook))
+(add-hook hook (lambda () (flyspell-mode 1))))
+
+#+END_SRC
+* GUI
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+#+END_SRC
+* Necessary
+Makes the custom variables not be inside init.el. But in a custom file created
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
+#+BEGIN_SRC emacs-lisp
+(setq custom-file (make-temp-file "emacs-custom"))
+#+END_SRC
+
+Add support for more packages
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+	("melpa" . "https://melpa.org/packages/")))
+
+(package-initialize)
+(package-refresh-contents)
+
+; https://github.com/purcell/exec-path-from-shell
+(use-package exec-path-from-shell)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+#+END_SRC
+
+Use package for more compact package management
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+(package-refresh-contents)
+(package-install 'use-package)
+(eval-when-compile (require 'use-package)))
+; This is equivalent to setting :ensure t on each call to use-package
+(setq use-package-always-ensure t)
+#+END_SRC
+
+* Useful packages 
+#+BEGIN_SRC emacs-lisp
+(use-package evil-leader
+:config
+(global-evil-leader-mode)
+)
+(evil-leader/set-leader "SPC")
+
+(use-package evil-escape
+:config
+(evil-escape-mode)
+)
+(setq-default evil-escape-key-sequence "fd")
+
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+
+;; https://github.com/emacs-evil/evil-collection
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+(define-key evil-motion-state-map "," nil)
+(define-key evil-motion-state-map "<RET>" nil)
+
+#+END_SRC
+
+#+RESULTS:
+
+See which keys are available
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+:config
+(which-key-mode)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+:config
+(helm-mode)
+)
+(require 'helm-config)
+(evil-leader/set-key "SPC" 'helm-M-x)
+#+END_SRC
+
+Be able to edit the config fast
+#+BEGIN_SRC emacs-lisp
+(defun find-config ()
+   "Edit config.org"
+   (interactive)
+   (find-file "~/.emacs.d/emacs.org"))
+
+(defun reload-init-file ()
+  (interactive)
+  (load-file user-init-file))
+
+(which-key-declare-prefixes "SPC d" "Dotfile")
+(evil-leader/set-key
+ "de" 'find-config
+ "dr" 'reload-init-file
+)
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+(use-package powerline
+:config
+(powerline-default-theme)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+:config
+(dashboard-setup-startup-hook)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+:config
+(projectile-mode +1)
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit)
+(use-package evil-magit)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package ace-window)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-nerd-commenter)
+(which-key-declare-prefixes "SPC c" "Comment")
+(evil-leader/set-key
+  "cl" 'evilnc-comment-or-uncomment-lines
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package ace-jump-mode)
+(which-key-declare-prefixes "SPC j" "Jump")
+(evil-leader/set-key
+  "j w" 'ace-jump-word-mode
+)
+
+(which-key-declare-prefixes "SPC m" "Major")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package company)
+(add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package ace-link)
+(ace-link-setup-default)
+(which-key-declare-prefixes "SPC l" "Links")
+(evil-leader/set-key 
+"l o" 'ace-link
+"l i" 'org-insert-link
+"l s" 'org-store-link
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package evil-matchit)
+(global-evil-matchit-mode 1)
+#+END_SRC
+
+* Tools
+** Pdf 
+   #+BEGIN_SRC emacs-lisp
+   (use-package pdf-tools)
+   (pdf-loader-install)
+   
+   ;; (which-key-declare-prefixes "SPC m f" "Fit")
+   (evil-leader/set-key-for-mode 'pdf-view-mode 
+   "m f" 'pdf-view-fit-height-to-window
+   )
+   #+END_SRC
+
+   #+RESULTS:
+
+* General Keybindings
+#+BEGIN_SRC emacs-lisp
+(which-key-declare-prefixes "SPC f" "File")
+(evil-leader/set-key 
+"fr" 'helm-recentf
+"ff" 'helm-find-files
+"fs" 'save-buffer
+"fS" 'save-some-buffers
+
+)
+
+(which-key-declare-prefixes "SPC b" "Buffer")
+(evil-leader/set-key
+ "bd" 'kill-current-buffer
+ "bb" 'helm-buffers-list
+)
+
+(which-key-declare-prefixes "SPC w" "Window")
+(evil-leader/set-key
+ "wd" 'delete-window
+ "wh" 'split-window-horizontally
+ "wv" 'split-window-vertically
+ "ws" 'ace-window
+)
+
+(which-key-declare-prefixes "SPC p" "project")
+(evil-leader/set-key
+ "pf" 'projectile-find-file
+ "pr" 'projectile-recentf
+ "pp" 'projectile-switch-project
+)
+
+(which-key-declare-prefixes "SPC q" "Quit")
+(evil-leader/set-key
+ "qq" 'kill-emacs
+)
+
+(evil-leader/set-key
+ "TAB" 'switch-to-prev-buffer
+)
+#+END_SRC
+
+#+RESULTS:
+
+* Programming
+
+https://www.flycheck.org/en/latest/
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :init (global-flycheck-mode)
+)
+#+END_SRC
+
+** Python
+   
+#+BEGIN_SRC emacs-lisp
+(use-package pyenv-mode)
+(use-package importmagic
+    :config
+    (add-hook 'python-mode-hook 'importmagic-mode))
+(use-package python-pytest)
+(use-package quickrun)
+ 
+;; https://emacs-lsp.github.io/dap-mode/page/configuration/
+(require 'dap-python)
+(add-hook 'dap-stopped-hook
+          (lambda (arg) (call-interactively #'dap-hydra)))
+
+(use-package sphinx-doc)
+(add-hook 'python-mode-hook (lambda ()
+                                  (require 'sphinx-doc)
+                                  (sphinx-doc-mode t)))
+
+(which-key-declare-prefixes "SPC m t" "Test")
+(which-key-declare-prefixes "SPC m r" "Run")
+
+(evil-leader/set-key-for-mode 'python-mode 
+"m =" 'lsp-format-buffer
+"m t t" 'python-pytest
+"m t f" 'python-pytest-function
+"m t ." 'python-pytest-popup
+"m r r" 'quickrun
+"m r a" 'quickrun-with-arg
+"m d b" 'dap-breakpoint-toggle
+"m d d" 'dap-debug
+"m i" 'run-python
+)
+#+END_SRC
+
+#+RESULTS:
+** LSP
+https://emacs-lsp.github.io/lsp-mode/page/installation/
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+    :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+            (python-mode . lsp)
+            ;; if you want which-key integration
+            (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are helm user
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+;; if you are ivy user
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+; https://emacs.stackexchange.com/questions/55199/what-are-these-prefix-commands-that-start-with-s-l
+;; (setq lsp-keymap-prefix "SPC m l")
+
+;; (which-key-declare-prefixes "SPC m" "Major")
+;; (evil-leader/set-key 
+;; "ml" 'helm-recentf
+;; )
+#+END_SRC
+
+#+RESULTS:
+: SPC m l
+
