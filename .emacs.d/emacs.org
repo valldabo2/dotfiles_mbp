@@ -1,10 +1,12 @@
 Inspiration
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
-https://github.com/vidjuheffex/dotemacs/blob/master/emacs.org
-https://jamiecollinson.com/blog/my-emacs-config/
+https://ww.com/blog/my-emacs-config/
 
 * TODO
   https://github.com/alphapapa/org-rifle
+  https://github.com/Silex/docker.el
+  https://github.com/spotify/dockerfile-mode
+  https://github.com/emacs-pe/docker-tramp.el
+  
 * Config
   #+BEGIN_SRC emacs-lisp
     (defun reload-emacs-configuration ()
@@ -22,6 +24,9 @@ https://jamiecollinson.com/blog/my-emacs-config/
 * General settings
    #+BEGIN_SRC emacs-lisp
      (global-display-line-numbers-mode)
+     (global-visual-line-mode 1)
+     (set-face-attribute 'default nil :height 150)
+
 
      (dolist (hook '(text-mode-hook))
        (add-hook hook (lambda () (flyspell-mode 1))))
@@ -33,6 +38,9 @@ https://jamiecollinson.com/blog/my-emacs-config/
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
+    
+    (use-package solarized-theme)
+    (load-theme 'solarized-dark t)
   #+END_SRC
 * Necessary
   Makes the custom variables not be inside init.el. But in a custom file created
@@ -64,10 +72,10 @@ https://jamiecollinson.com/blog/my-emacs-config/
   #+END_SRC
 * Useful packages 
   #+BEGIN_SRC emacs-lisp
-    (setq evil-want-integration t) 
-    (setq evil-want-keybinding nil)
-
-    (use-package evil 
+    (use-package evil
+      :init
+      (setq evil-want-integration t) 
+      (setq evil-want-keybinding nil)
       :config (evil-mode 1)
       )
     (use-package evil-collection
@@ -90,6 +98,8 @@ https://jamiecollinson.com/blog/my-emacs-config/
     (use-package helm :config (helm-mode))
     (use-package helm-projectile)
     (use-package helm-rg)
+    (use-package helm-swoop)
+    (use-package multiple-cursors)
     ;; (require 'helm-config)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
@@ -148,80 +158,125 @@ https://jamiecollinson.com/blog/my-emacs-config/
 	      '(lambda ()
 		 (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+  ;; (use-package iedit)
+  (use-package evil-multiedit)
+  #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package helm-ag)
+    (custom-set-variables
+     '(helm-ag-base-command "rg --no-heading")
+     '(helm-ag-success-exit-status '(0 2)))
+  #+END_SRC
 * General Keybindings
   #+BEGIN_SRC emacs-lisp
-    (use-package general)
-    (general-auto-unbind-keys)
+	(use-package general
+	  :init
+	  (setq general-override-states '(insert
+					  emacs
+					  hybrid
+					  normal
+					  visual
+					  motion
+					  operator
+					  replace))
+					  )
+	(general-auto-unbind-keys)
 
-    (general-define-key
-     :states '(normal visual emacs)
-     :prefix "SPC"
+	(general-define-key
+	 :states '(
+					  emacs
+					  hybrid
+					  normal
+					  visual
+					  motion
+					  operator
+					  replace)
+	:keymaps 'override
+	 :prefix "SPC"
+
+	 "" nil
+	 "m" '(:ignore t :which-key "Major")
  
-     "m" '(:ignore t :which-key "Major")
+	 "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
+	 "SPC" 'helm-M-x
+	 "a" '(:ignore t :which-key "Applications")
+	 "ad" 'dired
+	 "an" '(:ignore t :which-key "Notebook")
+	 "anr" 'ein:run
+	 "ans" 'ein:stop
+	 "ao" '(:ignore t :which-key "Org")
+	 "aoc" 'org-capture
  
-     "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
-     "SPC" 'helm-M-x
-     "a" '(:ignore t :which-key "Applications")
-     "ad" 'dired
-     "an" '(:ignore t :which-key "Notebook")
-     "anr" 'ein:run
-     "ans" 'ein:stop
-     "ao" '(:ignore t :which-key "Org")
-     "aoc" 'org-capture
+	 "f" '(:ignore t :which-key "Files")
+	 "fs" 'save-buffer
+	 "fr" 'helm-recentf
+	 "ff" 'helm-find-files
+	 "fS" 'save-some-buffers
+ 
+	 "x" '(:ignore t :which-key "Text")
+	 "xa" 'text-scale-adjust
+     
+	 "d" '(:ignore t :which-key "Dotfile")
+	 "dr" 'reload-emacs-configuration
+	 "do" 'open-emacs-configuration
+ 
+	 "b" '(:ignore t :which-key "Buffers")
+	 "bb" 'helm-buffers-list
+	 "bd" 'kill-current-buffer
+ 
+	 "h" '(:ignore t :which-key "Help")
+	 "hk" 'describe-key 
+	 "hv" 'describe-variable
+	 "hm" 'describe-mode
+	 "hf" 'describe-function
+ 
+	 "j" '(:ignore t :which-key "Jump")
+	 "jw" 'ace-jump-word-mode 
+ 
+	 "s" '(:ignore t :which-key "Search")
+	 ;; Searches without input
+	 "ss" 'helm-swoop-without-pre-input 
+	 "sS" 'helm-swoop
+	 "se" 'evil-multiedit-match-all
+ 
+	 "l" '(:ignore t :which-key "Links")
+	 "lo" 'ace-link
+	 "ls" 'org-store-link
+ 
+	 "c" '(:ignore t :which-key "Comments")
+	 "cl" 'evilnc-comment-or-uncomment-lines
+ 
+	 "w" '(:ignore t :which-key "Windows")
+	 "wd" 'delete-window
+	 "wh" 'split-window-horizontally
+	 "wv" 'split-window-vertically
+	 "ws" 'ace-window
+	 "1" '(winum-select-window-1 :which-key "window 1")
+	 "2" '(winum-select-window-2 :which-key "window 2")
+	 "3" '(winum-select-window-3 :which-key "window 3")
+	 "4" '(winum-select-window-4 :which-key "window 4")
+	 "5" '(winum-select-window-5 :which-key "window 5")
+ 
+	 "p" '(:ignore: t :which-key "Projects")
+	 "pf" 'helm-projectile-find-file
+	 "pr" 'helm-projectile-recentf
+	 "pp" 'helm-projectile-switch-project
+	 "ps" 'helm-do-ag-project-root
+ 
+	 "q" '(:ignore t :which-key "Quit")
+	 "qq" 'kill-emacs
+	 )
 
-     "f" '(:ignore t :which-key "Files")
-     "fs" 'save-buffer
-     "fr" 'helm-recentf
-     "ff" 'helm-find-files
-     "fS" 'save-some-buffers
-
-     "d" '(:ignore t :which-key "Dotfile")
-     "dr" 'reload-emacs-configuration
-     "do" 'open-emacs-configuration
-
-     "b" '(:ignore t :which-key "Buffers")
-     "bb" 'helm-buffers-list
-     "bd" 'kill-current-buffer
-
-     "h" '(:ignore t :which-key "Help")
-     "hk" 'describe-key 
-     "hv" 'describe-variable
-     "hm" 'describe-mode
-
-     "j" '(:ignore t :which-key "Jump")
-     "jw" 'ace-jump-word-mode 
-
-     "s" '(:ignore t :which-key "Search")
-     "ss" 'helm-occur 
-
-     "l" '(:ignore t :which-key "Links")
-     "lo" 'ace-link
-     "ls" 'org-store-link
-
-     "c" '(:ignore t :which-key "Comments")
-     "cl" 'evilnc-comment-or-uncomment-lines
-
-     "w" '(:ignore t :which-key "Windows")
-     "wd" 'delete-window
-     "wh" 'split-window-horizontally
-     "wv" 'split-window-vertically
-     "ws" 'ace-window
-     "1" '(winum-select-window-1 :which-key "window 1")
-     "2" '(winum-select-window-2 :which-key "window 2")
-     "3" '(winum-select-window-3 :which-key "window 3")
-     "4" '(winum-select-window-4 :which-key "window 4")
-     "5" '(winum-select-window-5 :which-key "window 5")
-
-     "p" '(:ignore: t :which-key "Projects")
-     "pf" 'helm-projectile-find-file
-     "pr" 'helm-projectile-recentf
-     "pp" 'helm-projectile-switch-project
-
-     "q" '(:ignore t :which-key "Quit")
-     "qq" 'kill-emacs
-
-     )
+	(general-define-key
+	 :keymaps 'evil-multiedit-state-map
+	 "RET" 'evil-multiedit-toggle-or-restrict-region
+	 "n" 'evil-multiedit-next
+	 "N" 'evil-multiedit-prev
+	 )
   #+END_SRC
+
 * Tools
 ** Pdf 
    #+BEGIN_SRC emacs-lisp
@@ -236,13 +291,14 @@ https://jamiecollinson.com/blog/my-emacs-config/
       "," nil
       )
      (general-define-key
-      :states '(normal override)
+      :states 'normal
       :keymaps 'pdf-view-mode-map
       :prefix "SPC m"
       "f" 'pdf-view-fit-height-to-window
       "s" 'pdf-occur
       )
    #+END_SRC
+
 ** Org mode 
    #+BEGIN_SRC emacs-lisp
      (general-define-key
@@ -329,6 +385,28 @@ https://jamiecollinson.com/blog/my-emacs-config/
 	      ("\\.markdown\\'" . markdown-mode))
        :init (setq markdown-command "multimarkdown"))
    #+END_SRC
+** Plantuml
+   #+BEGIN_SRC emacs-lisp
+   (use-package plantuml-mode
+   :config
+   (setq plantuml-jar-path "~/plantuml.jar")
+   (setq plantuml-default-exec-mode 'jar)
+   (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+   (plantuml-enable-debug)
+   (setq plantuml-output-type "png")
+   )
+   #+END_SRC
+** Snippets
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet)
+   (use-package yasnippet-snippets)
+   (yas-reload-all)
+   (add-hook 'prog-mode-hook #'yas-minor-mode)
+   #+END_SRC
+
+   #+RESULTS:
+   | yas-minor-mode | rainbow-delimiters-mode |
+
 * Programming
   https://www.flycheck.org/en/latest/
   #+BEGIN_SRC emacs-lisp
@@ -347,6 +425,7 @@ https://jamiecollinson.com/blog/my-emacs-config/
     (add-hook 'python-mode-hook (lambda ()
 				  (require 'sphinx-doc)
 				  (sphinx-doc-mode t)))
+    (add-hook 'python-mode-hook       'hs-minor-mode)
 
     (general-define-key
      :states '(normal visual emacs)
@@ -369,6 +448,10 @@ https://jamiecollinson.com/blog/my-emacs-config/
      "g" '(:ignore t :which-key "Go to")
      "gd" 'lsp-find-definition
      "gr" 'lsp-find-references
+     "v" '(:ignore t :which-key "Pyenv")
+     "vs" 'pyenv-mode-set
+     "x" '(:ignore t :which-key "Text")
+     "xs" 'yas-insert-snippet
      )
   #+END_SRC
 *** EIN 
@@ -417,11 +500,20 @@ https://jamiecollinson.com/blog/my-emacs-config/
    #+END_SRC
 * Left over
   #+BEGIN_SRC emacs-lisp
-    ;; Binds comma to SPC m for quicker major modes
-    (general-evil-setup)
-    (general-nmap "," (general-simulate-key "SPC m"))
-
+    (general-def
+      :states 'normal
+      ","
+      ;; Binds , to access major mode
+      (general-key-dispatch (general-simulate-key "SPC m")
+	:timeout 0.25
+	;; Binds ,, if fast
+	"," (general-simulate-key "C-c C-c")
+	)
+      )
     (add-hook 'fundamental-mode-hook 'normal-mode) 
     ;; Does not work
     ;; (add-hook 'messages-buffer-mode-hook 'normal-mode)
   #+END_SRC
+
+  #+RESULTS:
+  | normal-mode |
