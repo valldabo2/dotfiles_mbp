@@ -206,6 +206,7 @@ https://ww.com/blog/my-emacs-config/
 	 "an" '(:ignore t :which-key "Notebook")
 	 "anr" 'ein:run
 	 "ans" 'ein:stop
+	 "ano" 'ein:process-find-file-callback
 	 "ao" '(:ignore t :which-key "Org")
 	 "aoc" 'org-capture
  
@@ -222,9 +223,11 @@ https://ww.com/blog/my-emacs-config/
 	 "dr" 'reload-emacs-configuration
 	 "do" 'open-emacs-configuration
  
-	 "b" '(:ignore t :which-key "Buffers")
+	 "b" '(:ignore t :which-key "Buffers/Bookmarks")
 	 "bb" 'helm-buffers-list
 	 "bd" 'kill-current-buffer
+	 "bs" 'bookmark-set
+	 "bo" 'helm-bookmarks
  
 	 "h" '(:ignore t :which-key "Help")
 	 "hk" 'describe-key 
