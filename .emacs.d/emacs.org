@@ -462,7 +462,7 @@ https://ww.com/blog/my-emacs-config/
      (use-package ein)
      (setq ein:output-area-inlined-images t)
      (setq ein:jupyter-default-notebook-directory "~/")
-     
+
      (general-define-key
       :definer 'minor-mode
       :states 'normal
@@ -473,7 +473,9 @@ https://ww.com/blog/my-emacs-config/
       "s" 'ein:notebook-save-notebook-command
       "e" 'ein:worksheet-execute-cell
       "E" 'ein:worksheet-execute-all-cells
-      "RET" 'ein:worksheet-execute-cell
+      "RET" 'ein:worksheet-execute-cell-and-goto-next-km
+      "o" 'ein:worksheet-clear-output
+      "O" 'ein:worksheet-clear-all-output-km
       "d" 'ein:worksheet-delete-cell
       "c" 'ein:notebook-kill-kernel-then-close-command
       "k" '(:ignore t :which-key "Kernel")

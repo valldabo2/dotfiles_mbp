@@ -1,6 +1,6 @@
 # Aliases
 alias spacemacsclient="emacsclient -c"
-export TERM="xterm-256color"
+# export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
 # export http_proxy=localhost:3128
@@ -11,7 +11,7 @@ export TERM="xterm-256color"
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/bd92eu/.oh-my-zsh"
+# export ZSH="/Users/bd92eu/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -77,7 +77,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time vi_mode)
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
 # Set fzf installation directory path
-export FZF_BASE=/usr/local/bin/fzf
+# export FZF_BASE=/usr/local/bin/fzf
 
 # Uncomment the following line to disable fuzzy completion
 # export DISABLE_FZF_AUTO_COMPLETION="true"
@@ -138,18 +138,13 @@ source $ZSH/oh-my-zsh.sh
 # unset __conda_setup
 # # <<< conda initialize <<<
 
-export PATH="$HOME/.jenv/bin:$PATH"
+# export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
 
-export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
+# export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
 eval "$(pyenv init - zsh)"
 eval "$(pyenv virtualenv-init - zsh)"
 
-# export PKG_CONFIG_PATH="/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig"
-
-# export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
-# export PATH=/usr/local/bin/autoconf:$PATH
-
 # For pdf-tools in spacemacs
 # https://github.com/politza/pdf-tools
-export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+# export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
