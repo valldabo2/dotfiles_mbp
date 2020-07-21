@@ -422,6 +422,13 @@ https://ww.com/blog/my-emacs-config/
 
    #+RESULTS:
    | yas-minor-mode | rainbow-delimiters-mode |
+** Docker
+   #+BEGIN_SRC emacs-lisp
+   (use-package dockerfile-mode)
+   (use-package docker-compose-mode)
+   (use-package docker)
+   (use-package docker-tramp)
+   #+END_SRC
 
 * Programming
   https://www.flycheck.org/en/latest/
@@ -503,6 +510,7 @@ https://ww.com/blog/my-emacs-config/
      (use-package lsp-mode
        :hook (
 	      (python-mode . lsp)
+	      (dockerfile-mode . lsp)
 	      (lsp-mode . lsp-enable-which-key-integration))
        :commands lsp)
 
