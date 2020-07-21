@@ -5,6 +5,7 @@ export ZSH="/Users/bd92eu/.oh-my-zsh"
 
 # Set fzf installation directory path
 export FZF_BASE=/usr/local/bin/fzf
+export FZF_DEFAULT_COMMAND='fd --type f'
 
 export PATH="$HOME/.jenv/bin:$PATH"
 export PATH="/Users/bd92eu/.pyenv/bin:$PATH"

@@ -169,115 +169,119 @@ https://ww.com/blog/my-emacs-config/
      '(helm-ag-base-command "rg --no-heading")
      '(helm-ag-success-exit-status '(0 2)))
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+  (use-package fzf :init (setenv "FZF_DEFAULT_COMMAND" "fd --type f"))
+  #+END_SRC
 * General Keybindings
   #+BEGIN_SRC emacs-lisp
-	(use-package general
-	  :init
-	  (setq general-override-states '(insert
-					  emacs
-					  hybrid
-					  normal
-					  visual
-					  motion
-					  operator
-					  replace))
-					  )
-	(general-auto-unbind-keys)
+    (use-package general
+      :init
+      (setq general-override-states '(insert
+				      emacs
+				      hybrid
+				      normal
+				      visual
+				      motion
+				      operator
+				      replace))
+				      )
+    (general-auto-unbind-keys)
 
-	(general-define-key
-	 :states '(
-					  emacs
-					  hybrid
-					  normal
-					  visual
-					  motion
-					  operator
-					  replace)
-	:keymaps 'override
-	 :prefix "SPC"
+    (general-define-key
+     :states '(
+				      emacs
+				      hybrid
+				      normal
+				      visual
+				      motion
+				      operator
+				      replace)
+    :keymaps 'override
+     :prefix "SPC"
 
-	 "" nil
-	 "m" '(:ignore t :which-key "Major")
- 
-	 "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
-	 "SPC" 'helm-M-x
-	 "a" '(:ignore t :which-key "Applications")
-	 "ad" 'dired
-	 "an" '(:ignore t :which-key "Notebook")
-	 "anr" 'ein:run
-	 "ans" 'ein:stop
-	 "ano" 'ein:process-find-file-callback
-	 "ao" '(:ignore t :which-key "Org")
-	 "aoc" 'org-capture
- 
-	 "f" '(:ignore t :which-key "Files")
-	 "fs" 'save-buffer
-	 "fr" 'helm-recentf
-	 "ff" 'helm-find-files
-	 "fS" 'save-some-buffers
- 
-	 "x" '(:ignore t :which-key "Text")
-	 "xa" 'text-scale-adjust
-     
-	 "d" '(:ignore t :which-key "Dotfile")
-	 "dr" 'reload-emacs-configuration
-	 "do" 'open-emacs-configuration
- 
-	 "b" '(:ignore t :which-key "Buffers/Bookmarks")
-	 "bb" 'helm-buffers-list
-	 "bd" 'kill-current-buffer
-	 "bs" 'bookmark-set
-	 "bo" 'helm-bookmarks
- 
-	 "h" '(:ignore t :which-key "Help")
-	 "hk" 'describe-key 
-	 "hv" 'describe-variable
-	 "hm" 'describe-mode
-	 "hf" 'describe-function
- 
-	 "j" '(:ignore t :which-key "Jump")
-	 "jw" 'ace-jump-word-mode 
- 
-	 "s" '(:ignore t :which-key "Search")
-	 ;; Searches without input
-	 "ss" 'helm-swoop-without-pre-input 
-	 "sS" 'helm-swoop
-	 "se" 'evil-multiedit-match-all
- 
-	 "l" '(:ignore t :which-key "Links")
-	 "lo" 'ace-link
-	 "ls" 'org-store-link
- 
-	 "c" '(:ignore t :which-key "Comments")
-	 "cl" 'evilnc-comment-or-uncomment-lines
- 
-	 "w" '(:ignore t :which-key "Windows")
-	 "wd" 'delete-window
-	 "wh" 'split-window-horizontally
-	 "wv" 'split-window-vertically
-	 "ws" 'ace-window
-	 "1" '(winum-select-window-1 :which-key "window 1")
-	 "2" '(winum-select-window-2 :which-key "window 2")
-	 "3" '(winum-select-window-3 :which-key "window 3")
-	 "4" '(winum-select-window-4 :which-key "window 4")
-	 "5" '(winum-select-window-5 :which-key "window 5")
- 
-	 "p" '(:ignore: t :which-key "Projects")
-	 "pf" 'helm-projectile-find-file
-	 "pr" 'helm-projectile-recentf
-	 "pp" 'helm-projectile-switch-project
-	 "ps" 'helm-do-ag-project-root
- 
-	 "q" '(:ignore t :which-key "Quit")
-	 "qq" 'kill-emacs
-	 )
+     "" nil
+     "m" '(:ignore t :which-key "Major")
 
-	(general-define-key
-	 :keymaps 'evil-multiedit-state-map
-	 "RET" 'evil-multiedit-toggle-or-restrict-region
-	 "n" 'evil-multiedit-next
-	 "N" 'evil-multiedit-prev
-	 )
+     "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
+     "SPC" 'helm-M-x
+     "a" '(:ignore t :which-key "Applications")
+     "ad" 'dired
+     "an" '(:ignore t :which-key "Notebook")
+     "anr" 'ein:run
+     "ans" 'ein:stop
+     "ano" 'ein:process-find-file-callback
+     "ao" '(:ignore t :which-key "Org")
+     "aoc" 'org-capture
+
+     "f" '(:ignore t :which-key "Files")
+     "fs" 'save-buffer
+     "fr" 'helm-recentf
+     "ff" 'helm-find-files
+     "fF" 'fzf-directory
+     "fS" 'save-some-buffers
+
+     "x" '(:ignore t :which-key "Text")
+     "xa" 'text-scale-adjust
+
+     "d" '(:ignore t :which-key "Dotfile")
+     "dr" 'reload-emacs-configuration
+     "do" 'open-emacs-configuration
+
+     "b" '(:ignore t :which-key "Buffers/Bookmarks")
+     "bb" 'helm-buffers-list
+     "bd" 'kill-current-buffer
+     "bs" 'bookmark-set
+     "bo" 'helm-bookmarks
+
+     "h" '(:ignore t :which-key "Help")
+     "hk" 'describe-key 
+     "hv" 'describe-variable
+     "hm" 'describe-mode
+     "hf" 'describe-function
+
+     "j" '(:ignore t :which-key "Jump")
+     "jw" 'ace-jump-word-mode 
+
+     "s" '(:ignore t :which-key "Search")
+     ;; Searches without input
+     "ss" 'helm-swoop-without-pre-input 
+     "sS" 'helm-swoop
+     "se" 'evil-multiedit-match-all
+
+     "l" '(:ignore t :which-key "Links")
+     "lo" 'ace-link
+     "ls" 'org-store-link
+
+     "c" '(:ignore t :which-key "Comments")
+     "cl" 'evilnc-comment-or-uncomment-lines
+
+     "w" '(:ignore t :which-key "Windows")
+     "wd" 'delete-window
+     "wh" 'split-window-horizontally
+     "wv" 'split-window-vertically
+     "ws" 'ace-window
+     "1" '(winum-select-window-1 :which-key "window 1")
+     "2" '(winum-select-window-2 :which-key "window 2")
+     "3" '(winum-select-window-3 :which-key "window 3")
+     "4" '(winum-select-window-4 :which-key "window 4")
+     "5" '(winum-select-window-5 :which-key "window 5")
+
+     "p" '(:ignore: t :which-key "Projects")
+     "pf" 'helm-projectile-find-file
+     "pr" 'helm-projectile-recentf
+     "pp" 'helm-projectile-switch-project
+     "ps" 'helm-do-ag-project-root
+
+     "q" '(:ignore t :which-key "Quit")
+     "qq" 'kill-emacs
+     )
+
+    (general-define-key
+     :keymaps 'evil-multiedit-state-map
+     "RET" 'evil-multiedit-toggle-or-restrict-region
+     "n" 'evil-multiedit-next
+     "N" 'evil-multiedit-prev
+     )
   #+END_SRC
 
 * Tools
