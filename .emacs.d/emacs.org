@@ -172,6 +172,14 @@ https://ww.com/blog/my-emacs-config/
   #+BEGIN_SRC emacs-lisp
   (use-package fzf :init (setenv "FZF_DEFAULT_COMMAND" "fd --type f"))
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+  (use-package elfeed)
+  (use-package elfeed-org
+  :config
+  (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  )
+  #+END_SRC
 * General Keybindings
   #+BEGIN_SRC emacs-lisp
     (use-package general
@@ -319,7 +327,8 @@ https://ww.com/blog/my-emacs-config/
       "l" '(:ignore t :which-key "Links")
       "li" 'org-insert-link
       "t" '(:ignore t :which-key "Toggle")
-      "tl" 'org-latex-preview
+      "t" 'org-toggle-link-display
+      "tL" 'org-latex-preview
       "j" '(:ignore t :which-key "Jump")
       "ji" 'helm-org-in-buffer-headings
       "'" 'org-edit-special
