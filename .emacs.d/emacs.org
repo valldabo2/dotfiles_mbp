@@ -9,6 +9,8 @@ https://ww.com/blog/my-emacs-config/
   
 * Config
   #+BEGIN_SRC emacs-lisp
+    (setq gc-cons-threshold 100000000)
+
     (defun reload-emacs-configuration ()
       (interactive)
       (load-file user-init-file))
@@ -17,22 +19,6 @@ https://ww.com/blog/my-emacs-config/
       (interactive)
       (find-file "~/.emacs.d/emacs.org"))
   #+END_SRC
-* Backups
-  #+BEGIN_SRC emacs-lisp
-    (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-  #+END_SRC
-* General settings
-   #+BEGIN_SRC emacs-lisp
-     (global-display-line-numbers-mode)
-     (global-visual-line-mode 1)
-     (set-face-attribute 'default nil :height 150)
-
-
-     (dolist (hook '(text-mode-hook))
-       (add-hook hook (lambda () (flyspell-mode 1))))
-
-     (setq buffer-save-without-query t)
-   #+END_SRC
 * GUI
   #+BEGIN_SRC emacs-lisp
     (menu-bar-mode -1)
@@ -45,6 +31,111 @@ https://ww.com/blog/my-emacs-config/
     (use-package fill-column-indicator)
     (add-hook 'prog-mode-hook #'fci-mode)
   #+END_SRC
+** Hydras 
+   #+BEGIN_SRC emacs-lisp
+    (use-package hydra)
+   #+END_SRC
+*** Buffers 
+  #+BEGIN_SRC emacs-lisp
+    (defhydra hydra-buffer-menu (:hint nil)
+      "
+	  ^Mark^             ^Unmark^           ^Actions^          ^Search
+	  ^^^^^^^^-----------------------------------------------------------------
+	  _m_: mark          _u_: unmark        _x_: execute       _R_: re-isearch
+	  _s_: save          _U_: unmark up     _b_: bury          _I_: isearch
+	  _d_: delete        ^ ^                _g_: refresh       _O_: multi-occur
+	  _D_: delete up     ^ ^                _T_: files only: % -28`Buffer-menu-files-only
+	  _~_: modified
+	  "
+      ("m" Buffer-menu-mark)
+      ("u" Buffer-menu-unmark)
+      ("U" Buffer-menu-backup-unmark)
+      ("d" Buffer-menu-delete)
+      ("D" Buffer-menu-delete-backwards)
+      ("s" Buffer-menu-save)
+      ("~" Buffer-menu-not-modified)
+      ("x" Buffer-menu-execute)
+      ("b" Buffer-menu-bury)
+      ("g" revert-buffer)
+      ("T" Buffer-menu-toggle-files-only)
+      ("O" Buffer-menu-multi-occur :color blue)
+      ("I" Buffer-menu-isearch-buffers :color blue)
+      ("R" Buffer-menu-isearch-buffers-regexp :color blue)
+      ("c" nil "cancel")
+      ("v" Buffer-menu-select "select" :color blue)
+      ("o" Buffer-menu-other-window "other-window" :color blue)
+      ("q" quit-window "quit" :color blue))
+
+    ;; Convienience function to open buffer list and hydra
+    (defun buffer-list-hydra ()
+      (interactive)
+      (buffer-menu)
+      (hydra-buffer-menu/body)
+      )
+  #+END_SRC
+*** Windows
+    #+BEGIN_SRC emacs-lisp
+      (defhydra hydra-window (:hint nil)
+	"
+	  Movement^^        ^Split^         ^Switch^		^Resize^
+	  ----------------------------------------------------------------
+	  _h_ ←       	_v_ertical    	_b_uffer		_q_ X←
+	  _j_ ↓        	_x_ horizontal	_f_ind files	_w_ X↓
+	  _k_ ↑        	_z_ undo      	_a_ce 1		_e_ X↑
+	  _l_ →        	_Z_ reset      	_s_wap		_r_ X→
+	  _F_ollow		_D_lt Other   	_S_ave		max_i_mize
+	  _Q_ cancel	_o_nly this   	_d_elete	
+	  "
+	("h" windmove-left )
+	("j" windmove-down )
+	("k" windmove-up )
+	("l" windmove-right )
+	("q" enlarge-window-horizontally)
+	("w" shrink-window)
+	("e" enlarge-window)
+	("r" shrink-window-horizontally)
+	("b" helm-mini)
+	("f" helm-find-files)
+	("F" follow-mode)
+	("a" (lambda ()
+	       (interactive)
+	       (ace-window 1)
+	       (add-hook 'ace-window-end-once-hook
+			 'hydra-window/body))
+	 )
+	("v" (lambda ()
+	       (interactive)
+	       (split-window-right)
+	       (windmove-right))
+	 )
+	("x" (lambda ()
+	       (interactive)
+	       (split-window-below)
+	       (windmove-down))
+	 )
+	("s" (lambda ()
+	       (interactive)
+	       (ace-window 4)
+	       (add-hook 'ace-window-end-once-hook
+			 'hydra-window/body)))
+	("S" save-buffer)
+	("d" delete-window)
+	("D" (lambda ()
+	       (interactive)
+	       (ace-window 16)
+	       (add-hook 'ace-window-end-once-hook
+			 'hydra-window/body))
+	 )
+	("o" delete-other-windows)
+	("i" ace-maximize-window)
+	("z" (progn
+		    (winner-undo)
+		    (setq this-command 'winner-undo))
+	 )
+	("Z" winner-redo)
+	("Q" nil)
+	)
+    #+END_SRC
 * Necessary
   Makes the custom variables not be inside init.el. But in a custom file created
   https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
@@ -66,13 +157,36 @@ https://ww.com/blog/my-emacs-config/
     (unless (package-installed-p 'use-package)
       (package-install 'use-package)
       (eval-when-compile (require 'use-package)))
-    (setq use-package-always-ensure t)
+    ;; (setq use-package-always-ensure t)
+
+;; Enable defer and ensure by default for use-package
+;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
+(setq 
+      use-package-always-ensure t
+      backup-directory-alist `((".*" . ,temporary-file-directory))
+      auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))    
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package exec-path-from-shell)
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize))
   #+END_SRC
+* Backups
+  #+BEGIN_SRC emacs-lisp
+    (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+  #+END_SRC
+* General settings
+   #+BEGIN_SRC emacs-lisp
+     (global-display-line-numbers-mode)
+     (global-visual-line-mode 1)
+     (set-face-attribute 'default nil :height 150)
+
+
+     (dolist (hook '(text-mode-hook))
+       (add-hook hook (lambda () (flyspell-mode 1))))
+
+     (setq buffer-save-without-query t)
+   #+END_SRC
 * Useful packages 
   #+BEGIN_SRC emacs-lisp
     (use-package evil
@@ -185,115 +299,122 @@ https://ww.com/blog/my-emacs-config/
   #+END_SRC
 * General Keybindings
 #+BEGIN_SRC emacs-lisp
-    (use-package general
-      :init
-      (setq general-override-states '(insert
-				      emacs
-				      hybrid
-				      normal
-				      visual
-				      motion
-				      operator
-				      replace))
-				      )
-    (general-auto-unbind-keys)
+  (use-package general
+    :init
+    (setq general-override-states '(insert
+				    emacs
+				    hybrid
+				    normal
+				    visual
+				    motion
+				    operator
+				    replace))
+				    )
+  (general-auto-unbind-keys)
 
-    (general-define-key
-     :states '(
-				      emacs
-				      hybrid
-				      normal
-				      visual
-				      motion
-				      operator
-				      replace)
-    :keymaps 'override
-     :prefix "SPC"
+  (general-define-key
+   :states '(
+				    emacs
+				    hybrid
+				    normal
+				    visual
+				    motion
+				    operator
+				    replace)
+  :keymaps 'override
+   :prefix "SPC"
 
-     "" nil
-     "m" '(:ignore t :which-key "Major")
+   "" nil
+   "m" '(:ignore t :which-key "Major")
 
-     "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
-     "SPC" 'helm-M-x
-     "a" '(:ignore t :which-key "Applications")
-     "ad" 'dired
-     "aD" 'docker
-     "an" '(:ignore t :which-key "Notebook")
-     "anr" 'ein:run
-     "ans" 'ein:stop
-     "ano" 'ein:process-find-file-callback
-     "ao" '(:ignore t :which-key "Org")
-     "aoc" 'org-capture
+   "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
+   "SPC" 'helm-M-x
+   "a" '(:ignore t :which-key "Applications")
+   "ad" 'dired
+   "aD" 'docker
+   "an" '(:ignore t :which-key "Notebook")
+   "anr" 'ein:run
+   "ans" 'ein:stop
+   "ano" 'ein:process-find-file-callback
+   "ao" '(:ignore t :which-key "Org")
 
-     "f" '(:ignore t :which-key "Files")
-     "fs" 'save-buffer
-     "fr" 'helm-recentf
-     "ff" 'helm-find-files
-     "fF" 'fzf-directory
-     "fS" 'save-some-buffers
+   "aoa" 'org-agenda
 
-     "x" '(:ignore t :which-key "Text")
-     "xa" 'text-scale-adjust
+   "f" '(:ignore t :which-key "Files")
+   "fs" 'save-buffer
+   "fr" 'helm-recentf
+   "ff" 'helm-find-files
+   "fF" 'fzf-directory
+   "fS" 'save-some-buffers
 
-     "d" '(:ignore t :which-key "Dotfile")
-     "dr" 'reload-emacs-configuration
-     "do" 'open-emacs-configuration
+   "x" '(:ignore t :which-key "Text")
+   "xa" 'text-scale-adjust
 
-     "b" '(:ignore t :which-key "Buffers/Bookmarks")
-     "bb" 'helm-buffers-list
-     "bd" 'kill-current-buffer
-     "bs" 'bookmark-set
-     "bo" 'helm-bookmarks
+   "d" '(:ignore t :which-key "Dotfile")
+   "dr" 'reload-emacs-configuration
+   "do" 'open-emacs-configuration
 
-     "h" '(:ignore t :which-key "Help")
-     "hk" 'describe-key 
-     "hv" 'describe-variable
-     "hm" 'describe-mode
-     "hf" 'describe-function
+   "b" '(:ignore t :which-key "Buffers/Bookmarks")
+   "bb" 'helm-buffers-list
+   "bd" 'kill-current-buffer
+   "bs" 'bookmark-set
+   "bo" 'helm-bookmarks
+   "b." 'buffer-list-hydra
 
-     "j" '(:ignore t :which-key "Jump")
-     "jw" 'ace-jump-word-mode 
+   "h" '(:ignore t :which-key "Help")
+   "hk" 'describe-key 
+   "hv" 'describe-variable
+   "hm" 'describe-mode
+   "hf" 'describe-function
 
-     "s" '(:ignore t :which-key "Search")
-     ;; Searches without input
-     "ss" 'helm-swoop-without-pre-input 
-     "sS" 'helm-swoop
-     "se" 'evil-multiedit-match-all
+   "j" '(:ignore t :which-key "Jump")
+   "jw" 'ace-jump-word-mode 
 
-     "l" '(:ignore t :which-key "Links")
-     "lo" 'ace-link
-     "ls" 'org-store-link
+   "g" '(:ignore t :which-key "Git")
+   "gs" 'magit-status
 
-     "c" '(:ignore t :which-key "Comments")
-     "cl" 'evilnc-comment-or-uncomment-lines
 
-     "w" '(:ignore t :which-key "Windows")
-     "wd" 'delete-window
-     "wh" 'split-window-horizontally
-     "wv" 'split-window-vertically
-     "ws" 'ace-window
-     "1" '(winum-select-window-1 :which-key "window 1")
-     "2" '(winum-select-window-2 :which-key "window 2")
-     "3" '(winum-select-window-3 :which-key "window 3")
-     "4" '(winum-select-window-4 :which-key "window 4")
-     "5" '(winum-select-window-5 :which-key "window 5")
+   "s" '(:ignore t :which-key "Search")
+   ;; Searches without input
+   "ss" 'helm-swoop-without-pre-input 
+   "sS" 'helm-swoop
+   "se" 'evil-multiedit-match-all
 
-     "p" '(:ignore: t :which-key "Projects")
-     "pf" 'helm-projectile-find-file
-     "pr" 'helm-projectile-recentf
-     "pp" 'helm-projectile-switch-project
-     "ps" 'helm-do-ag-project-root
+   "l" '(:ignore t :which-key "Links")
+   "lo" 'ace-link
+   "ls" 'org-store-link
 
-     "q" '(:ignore t :which-key "Quit")
-     "qq" 'kill-emacs
-     )
+   "c" '(:ignore t :which-key "Comments")
+   "cl" 'evilnc-comment-or-uncomment-lines
 
-    (general-define-key
-     :keymaps 'evil-multiedit-state-map
-     "RET" 'evil-multiedit-toggle-or-restrict-region
-     "n" 'evil-multiedit-next
-     "N" 'evil-multiedit-prev
-     )
+   "w" '(:ignore t :which-key "Windows")
+   "wd" 'delete-window
+   "wh" 'split-window-horizontally
+   "wv" 'split-window-vertically
+   "ws" 'ace-window
+   "1" '(winum-select-window-1 :which-key "window 1")
+   "2" '(winum-select-window-2 :which-key "window 2")
+   "3" '(winum-select-window-3 :which-key "window 3")
+   "4" '(winum-select-window-4 :which-key "window 4")
+   "5" '(winum-select-window-5 :which-key "window 5")
+   "w." 'hydra-window/body
+
+   "p" '(:ignore: t :which-key "Projects")
+   "pf" 'helm-projectile-find-file
+   "pr" 'helm-projectile-recentf
+   "pp" 'helm-projectile-switch-project
+   "ps" 'helm-do-ag-project-root
+
+   "q" '(:ignore t :which-key "Quit")
+   "qq" 'kill-emacs
+   )
+
+  (general-define-key
+   :keymaps 'evil-multiedit-state-map
+   "RET" 'evil-multiedit-toggle-or-restrict-region
+   "n" 'evil-multiedit-next
+   "N" 'evil-multiedit-prev
+   )
   #+END_SRC
 * Tools
 ** Pdf 
@@ -324,7 +445,6 @@ https://ww.com/blog/my-emacs-config/
      (general-define-key
       :states '(normal visual emacs)
       :keymaps 'org-mode-map
-      :major-mods 'org-mode
       :prefix "SPC m"
       "c" 'org-capture
       "a" 'org-agenda
@@ -338,6 +458,13 @@ https://ww.com/blog/my-emacs-config/
       "j" '(:ignore t :which-key "Jump")
       "ji" 'helm-org-in-buffer-headings
       "'" 'org-edit-special
+      )
+     (general-define-key
+      :keymaps 'org-agenda-mode-map
+      ;; R since r is refresh
+      "R" 'org-agenda-refile
+      ;; "x" makes bulk action
+      ;; "m" marks
       )
 
      (setq org-capture-templates '(
@@ -366,10 +493,12 @@ https://ww.com/blog/my-emacs-config/
      (use-package evil-org
        :after org
        :config
-       (add-hook 'org-mode-hook 'evil-org-mode)
-       (add-hook 'evil-org-mode-hook
-		 (lambda ()
-		   (evil-org-set-key-theme)))
+       ;; https://github.com/Somelauw/evil-org-mode
+       ;; Uses evil-collection
+       ;; (add-hook 'org-mode-hook 'evil-org-mode)
+       ;; (add-hook 'evil-org-mode-hook
+       ;; 		 (lambda ()
+       ;; 		   (evil-org-set-key-theme)))
        (require 'evil-org-agenda)
        (evil-org-agenda-set-keys)
        )
@@ -441,6 +570,39 @@ https://ww.com/blog/my-emacs-config/
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck :init (global-flycheck-mode))
   #+END_SRC
+** LSP
+   https://emacs-lsp.github.io/lsp-mode/page/installation/
+   #+BEGIN_SRC emacs-lisp
+     (use-package lsp-mode
+       :hook (
+	      (python-mode . lsp)
+	      (dockerfile-mode . lsp)
+	      ;; (scale-mode . lsp)
+	      ;; (lsp-mode .lsp-lens-mode)
+	      (lsp-mode . lsp-enable-which-key-integration))
+       :commands lsp
+       :config
+       (setq lsp-prefer-flymake nil)
+       )
+
+     ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+     (setq read-process-output-max (* 1024 1024)) ;; 1mb
+     (setq lsp-prefer-capf t)
+
+     (use-package lsp-ui :commands lsp-ui-mode)
+     (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+     (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+     (use-package dap-mode)
+     (require 'dap-python)
+
+     (add-hook 'dap-stopped-hook
+	       (lambda (arg) (call-interactively #'dap-hydra)))
+   #+END_SRC
+
+   #+RESULTS:
+   | dap-ui--show-many-windows | (lambda (arg) (call-interactively #'dap-hydra)) |
+
 ** Python
   #+BEGIN_SRC emacs-lisp
     (use-package pyenv-mode)
@@ -452,6 +614,10 @@ https://ww.com/blog/my-emacs-config/
       :config
       (setq quickrun-timeout-seconds nil)
       )
+
+    (use-package python-black
+      :demand t
+      :after python)
 
     (use-package sphinx-doc)
     (add-hook 'python-mode-hook (lambda ()
@@ -466,6 +632,7 @@ https://ww.com/blog/my-emacs-config/
      :prefix "SPC m"
 
      "=" 'lsp-format-buffer
+     "b" 'python-black-buffer
      "t" '(:ignore t :which-key "Tests")
      "tt" 'python-pytest
      "tf" 'python-pytest-function
@@ -492,6 +659,8 @@ https://ww.com/blog/my-emacs-config/
      (setq ein:output-area-inlined-images t)
      (setq ein:jupyter-default-notebook-directory "~/")
 
+     (add-hook 'ein:notebook-mode-hook 'elpy-enable)
+
      (general-define-key
       :definer 'minor-mode
       :states 'normal
@@ -506,6 +675,7 @@ https://ww.com/blog/my-emacs-config/
       "o" 'ein:worksheet-clear-output
       "O" 'ein:worksheet-clear-all-output-km
       "d" 'ein:worksheet-delete-cell
+      "D" 'elpy-doc
       "c" 'ein:notebook-kill-kernel-then-close-command
       "k" '(:ignore t :which-key "Kernel")
       "ks" 'ein:notebook-switch-kernel
@@ -513,26 +683,78 @@ https://ww.com/blog/my-emacs-config/
       "ki" 'ein:notebook-kernel-interrupt-command
       )
    #+END_SRC
-** LSP
-   https://emacs-lsp.github.io/lsp-mode/page/installation/
+** Scala 
+   [[https://scalameta.org/metals/docs/editors/emacs.html][Emacs · Metals]] 
    #+BEGIN_SRC emacs-lisp
-     (use-package lsp-mode
-       :hook (
-	      (python-mode . lsp)
-	      (dockerfile-mode . lsp)
-	      (lsp-mode . lsp-enable-which-key-integration))
-       :commands lsp)
+;; Enable scala-mode for highlighting, indentation and motion commands
+(use-package scala-mode
+  :mode "\\.s\\(cala\\|bt\\)$")
 
-     (use-package lsp-ui :commands lsp-ui-mode)
-     (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-     (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+)
 
-     (use-package dap-mode)
-     (require 'dap-python)
+;; Enable nice rendering of diagnostics like compile errors.
+(use-package flycheck
+  :init (global-flycheck-mode))
 
-     (add-hook 'dap-stopped-hook
-	       (lambda (arg) (call-interactively #'dap-hydra)))
+(use-package lsp-mode
+  ;; Optional - enable lsp-mode automatically in scala files
+  :hook  (scala-mode . lsp)
+         (lsp-mode . lsp-lens-mode)
+  :config (setq lsp-prefer-flymake nil))
+
+;; Add metals backend for lsp-mode
+(use-package lsp-metals)
+
+;; Enable nice rendering of documentation on hover
+(use-package lsp-ui)
+
+;; lsp-mode supports snippets, but in order for them to work you need to use yasnippet
+;; If you don't want to use snippets set lsp-enable-snippet to nil in your lsp-mode settings
+;;   to avoid odd behavior with snippets and indentation
+(use-package yasnippet)
+
+;; Add company-lsp backend for metals
+(use-package company-lsp)
+
+;; Use the Debug Adapter Protocol for running tests and debugging
+(use-package posframe
+  ;; Posframe is a pop-up tool that must be manually installed for dap-mode
+  )
+(use-package dap-mode
+  :hook
+  (lsp-mode . dap-mode)
+  (lsp-mode . dap-ui-mode)
+  )
+
+;; Use the Tree View Protocol for viewing the project structure and triggering compilation
+(use-package lsp-treemacs
+  :config
+  ;; (lsp-metals-treeview-enable t)
+  (setq lsp-metals-treeview-show-when-views-received t)
+  )
    #+END_SRC
+
+** Java
+   #+BEGIN_SRC emacs-lisp
+(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+(use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
+(use-package dap-java :ensure nil)
+   #+END_SRC
+
+   #+RESULTS:
+
 * Left over
   #+BEGIN_SRC emacs-lisp
     (general-def
@@ -552,3 +774,6 @@ https://ww.com/blog/my-emacs-config/
 
   #+RESULTS:
   | normal-mode |
+* Other/Testing
+  #+BEGIN_SRC emacs-lisp
+  #+END_SRC
