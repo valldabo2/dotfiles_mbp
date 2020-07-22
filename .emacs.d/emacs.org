@@ -38,9 +38,12 @@ https://ww.com/blog/my-emacs-config/
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
-    
+
     (use-package solarized-theme)
     (load-theme 'solarized-dark t)
+
+    (use-package fill-column-indicator)
+    (add-hook 'prog-mode-hook #'fci-mode)
   #+END_SRC
 * Necessary
   Makes the custom variables not be inside init.el. But in a custom file created
@@ -181,7 +184,7 @@ https://ww.com/blog/my-emacs-config/
   )
   #+END_SRC
 * General Keybindings
-  #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (use-package general
       :init
       (setq general-override-states '(insert
@@ -214,6 +217,7 @@ https://ww.com/blog/my-emacs-config/
      "SPC" 'helm-M-x
      "a" '(:ignore t :which-key "Applications")
      "ad" 'dired
+     "aD" 'docker
      "an" '(:ignore t :which-key "Notebook")
      "anr" 'ein:run
      "ans" 'ein:stop
@@ -291,7 +295,6 @@ https://ww.com/blog/my-emacs-config/
      "N" 'evil-multiedit-prev
      )
   #+END_SRC
-
 * Tools
 ** Pdf 
    #+BEGIN_SRC emacs-lisp
@@ -316,6 +319,8 @@ https://ww.com/blog/my-emacs-config/
 
 ** Org mode 
    #+BEGIN_SRC emacs-lisp
+     (use-package org-cliplink)
+
      (general-define-key
       :states '(normal visual emacs)
       :keymaps 'org-mode-map
@@ -326,6 +331,7 @@ https://ww.com/blog/my-emacs-config/
       "r" '(org-refile :which-key "Refile")
       "l" '(:ignore t :which-key "Links")
       "li" 'org-insert-link
+      "lI" 'org-cliplink
       "t" '(:ignore t :which-key "Toggle")
       "t" 'org-toggle-link-display
       "tL" 'org-latex-preview
@@ -442,7 +448,10 @@ https://ww.com/blog/my-emacs-config/
       :config
       (add-hook 'python-mode-hook 'importmagic-mode))
     (use-package python-pytest)
-    (use-package quickrun)
+    (use-package quickrun
+      :config
+      (setq quickrun-timeout-seconds nil)
+      )
 
     (use-package sphinx-doc)
     (add-hook 'python-mode-hook (lambda ()
@@ -455,7 +464,7 @@ https://ww.com/blog/my-emacs-config/
      :keymaps 'python-mode-map
      :major-modes 'python-mode
      :prefix "SPC m"
- 
+
      "=" 'lsp-format-buffer
      "t" '(:ignore t :which-key "Tests")
      "tt" 'python-pytest
