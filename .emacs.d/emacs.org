@@ -11,6 +11,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 * Config
   #+BEGIN_SRC emacs-lisp
     (setq gc-cons-threshold 100000000)
+    (setq default-directory "~/")
+
 
     (defun reload-emacs-configuration ()
       (interactive)
