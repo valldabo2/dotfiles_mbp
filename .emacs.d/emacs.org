@@ -3,10 +3,8 @@ https://ww.com/blog/my-emacs-config/
 
 * TODO
   https://github.com/alphapapa/org-rifle
-  https://github.com/Silex/docker.el
   https://github.com/spotify/dockerfile-mode
   https://github.com/emacs-pe/docker-tramp.el
-  
 * Config
   #+BEGIN_SRC emacs-lisp
     (setq gc-cons-threshold 100000000)
@@ -19,6 +17,45 @@ https://ww.com/blog/my-emacs-config/
       (interactive)
       (find-file "~/.emacs.d/emacs.org"))
   #+END_SRC
+* Necessary
+  Makes the custom variables not be inside init.el. But in a custom file created
+  https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
+  #+BEGIN_SRC emacs-lisp
+    (setq custom-file (make-temp-file "emacs-custom"))
+  #+END_SRC
+  Add support for more packages
+  #+BEGIN_SRC emacs-lisp
+    (require 'package)
+    (setq package-archives
+	  '(("gnu" . "https://elpa.gnu.org/packages/")
+	    ("org" . "http://orgmode.org/elpa/")
+	    ("melpa" . "https://melpa.org/packages/")
+	    ("melpa-stable" . "https://stable.melpa.org/packages/")
+	    ))
+
+    ;; (package-initialize)
+    ;; (package-refresh-contents)
+  #+END_SRC
+
+  Use package for more compact package management
+  #+BEGIN_SRC emacs-lisp
+    (unless (package-installed-p 'use-package)
+      (package-install 'use-package)
+      (eval-when-compile (require 'use-package)))
+
+    ;; Enable defer and ensure by default for use-package
+    ;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
+    (setq 
+     use-package-always-ensure t
+     backup-directory-alist `((".*" . ,temporary-file-directory))
+     auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
+     )
+  #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (use-package exec-path-from-shell)
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+  #+END_SRC
 * GUI
   #+BEGIN_SRC emacs-lisp
     (menu-bar-mode -1)
@@ -28,8 +65,10 @@ https://ww.com/blog/my-emacs-config/
     (use-package solarized-theme)
     (load-theme 'solarized-dark t)
 
-    (use-package fill-column-indicator)
-    (add-hook 'prog-mode-hook #'fci-mode)
+    (use-package fill-column-indicator
+      :config
+      (add-hook 'prog-mode-hook #'fci-mode)
+    )
   #+END_SRC
 ** Hydras 
    #+BEGIN_SRC emacs-lisp
@@ -37,7 +76,7 @@ https://ww.com/blog/my-emacs-config/
    #+END_SRC
 *** Buffers 
   #+BEGIN_SRC emacs-lisp
-    (defhydra hydra-buffer-menu (:hint nil)
+    (defhydra hydra-buffer-menu (:hint nil :color pink)
       "
 	  ^Mark^             ^Unmark^           ^Actions^          ^Search
 	  ^^^^^^^^-----------------------------------------------------------------
@@ -61,7 +100,6 @@ https://ww.com/blog/my-emacs-config/
       ("O" Buffer-menu-multi-occur :color blue)
       ("I" Buffer-menu-isearch-buffers :color blue)
       ("R" Buffer-menu-isearch-buffers-regexp :color blue)
-      ("c" nil "cancel")
       ("v" Buffer-menu-select "select" :color blue)
       ("o" Buffer-menu-other-window "other-window" :color blue)
       ("q" quit-window "quit" :color blue))
@@ -136,41 +174,6 @@ https://ww.com/blog/my-emacs-config/
 	("Q" nil)
 	)
     #+END_SRC
-* Necessary
-  Makes the custom variables not be inside init.el. But in a custom file created
-  https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
-  #+BEGIN_SRC emacs-lisp
-    (setq custom-file (make-temp-file "emacs-custom"))
-  #+END_SRC
-  Add support for more packages
-  #+BEGIN_SRC emacs-lisp
-    (require 'package)
-    (setq package-archives
-	  '(("gnu" . "https://elpa.gnu.org/packages/")
-	    ("org" . "http://orgmode.org/elpa/")
-	    ("melpa" . "https://melpa.org/packages/")))
-    (package-initialize)
-    (package-refresh-contents)
-  #+END_SRC
-  Use package for more compact package management
-  #+BEGIN_SRC emacs-lisp
-    (unless (package-installed-p 'use-package)
-      (package-install 'use-package)
-      (eval-when-compile (require 'use-package)))
-    ;; (setq use-package-always-ensure t)
-
-;; Enable defer and ensure by default for use-package
-;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
-(setq 
-      use-package-always-ensure t
-      backup-directory-alist `((".*" . ,temporary-file-directory))
-      auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))    
-  #+END_SRC
-  #+BEGIN_SRC emacs-lisp
-    (use-package exec-path-from-shell)
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize))
-  #+END_SRC
 * Backups
   #+BEGIN_SRC emacs-lisp
     (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
@@ -180,7 +183,6 @@ https://ww.com/blog/my-emacs-config/
      (global-display-line-numbers-mode)
      (global-visual-line-mode 1)
      (set-face-attribute 'default nil :height 150)
-
 
      (dolist (hook '(text-mode-hook))
        (add-hook hook (lambda () (flyspell-mode 1))))
@@ -216,8 +218,6 @@ https://ww.com/blog/my-emacs-config/
     (use-package helm-projectile)
     (use-package helm-rg)
     (use-package helm-swoop)
-    (use-package multiple-cursors)
-    ;; (require 'helm-config)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package powerline :config (powerline-default-theme))
@@ -237,10 +237,7 @@ https://ww.com/blog/my-emacs-config/
     (use-package evil-magit)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
-    (use-package ace-window
-      :config
-      ;; (ace-window-display-mode)
-      )
+    (use-package ace-window)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package evil-nerd-commenter)
@@ -297,6 +294,9 @@ https://ww.com/blog/my-emacs-config/
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
   )
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (use-package vterm)
+  #+END_SRC
 * General Keybindings
 #+BEGIN_SRC emacs-lisp
   (use-package general
@@ -329,6 +329,7 @@ https://ww.com/blog/my-emacs-config/
 
    "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
    "SPC" 'helm-M-x
+   "'" 'vterm
    "a" '(:ignore t :which-key "Applications")
    "ad" 'dired
    "aD" 'docker
@@ -437,7 +438,6 @@ https://ww.com/blog/my-emacs-config/
       "s" 'pdf-occur
       )
    #+END_SRC
-
 ** Org mode 
    #+BEGIN_SRC emacs-lisp
      (use-package org-cliplink)
@@ -554,9 +554,6 @@ https://ww.com/blog/my-emacs-config/
    (yas-reload-all)
    (add-hook 'prog-mode-hook #'yas-minor-mode)
    #+END_SRC
-
-   #+RESULTS:
-   | yas-minor-mode | rainbow-delimiters-mode |
 ** Docker
    #+BEGIN_SRC emacs-lisp
    (use-package dockerfile-mode)
@@ -564,7 +561,6 @@ https://ww.com/blog/my-emacs-config/
    (use-package docker)
    (use-package docker-tramp)
    #+END_SRC
-
 * Programming
   https://www.flycheck.org/en/latest/
   #+BEGIN_SRC emacs-lisp
@@ -575,14 +571,17 @@ https://ww.com/blog/my-emacs-config/
    #+BEGIN_SRC emacs-lisp
      (use-package lsp-mode
        :hook (
-	      (python-mode . lsp)
 	      (dockerfile-mode . lsp)
-	      ;; (scale-mode . lsp)
-	      ;; (lsp-mode .lsp-lens-mode)
-	      (lsp-mode . lsp-enable-which-key-integration))
+	      (lsp-mode . lsp-lens-mode)
+	      (scala-mode . lsp)
+	      (sh-mode . lsp)
+	      (lsp-mode . lsp-enable-which-key-integration)
+	      (lsp-mode . lsp-ui-mode)
+	      ) 
        :commands lsp
        :config
        (setq lsp-prefer-flymake nil)
+       (setq lsp-log-io t)
        )
 
      ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
@@ -591,20 +590,34 @@ https://ww.com/blog/my-emacs-config/
 
      (use-package lsp-ui :commands lsp-ui-mode)
      (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-     (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-     (use-package dap-mode)
+     (use-package lsp-treemacs
+       :pin melpa-stable
+       :commands lsp-treemacs-errors-list
+       )
+     (use-package dap-mode
+       :after lsp-mode
+       :hook
+       (lsp-mode . dap-mode)
+       (lsp-mode . dap-ui-mode)
+       )
      (require 'dap-python)
 
      (add-hook 'dap-stopped-hook
 	       (lambda (arg) (call-interactively #'dap-hydra)))
    #+END_SRC
-
-   #+RESULTS:
-   | dap-ui--show-many-windows | (lambda (arg) (call-interactively #'dap-hydra)) |
-
 ** Python
   #+BEGIN_SRC emacs-lisp
+    ;; https://emacs-lsp.github.io/lsp-python-ms/
+    (use-package lsp-python-ms
+      :ensure t
+      :init (setq lsp-python-ms-auto-install-server t)
+      :hook (python-mode . (lambda ()
+			      (require 'lsp-python-ms)
+			      (lsp))))  ; or lsp-deferred
+
+    ;; (setf (lsp-session-folders-blacklist (lsp-session)) nil)
+    ;; (lsp--persist-session (lsp-session))
+
     (use-package pyenv-mode)
     (use-package importmagic
       :config
@@ -616,14 +629,14 @@ https://ww.com/blog/my-emacs-config/
       )
 
     (use-package python-black
-      :demand t
+      :demand
       :after python)
 
     (use-package sphinx-doc)
     (add-hook 'python-mode-hook (lambda ()
 				  (require 'sphinx-doc)
 				  (sphinx-doc-mode t)))
-    (add-hook 'python-mode-hook       'hs-minor-mode)
+    (add-hook 'python-mode-hook 'hs-minor-mode)
 
     (general-define-key
      :states '(normal visual emacs)
@@ -631,7 +644,8 @@ https://ww.com/blog/my-emacs-config/
      :major-modes 'python-mode
      :prefix "SPC m"
 
-     "=" 'lsp-format-buffer
+     ;; "=" 'lsp-format-buffer
+     "R" 'lsp-rename
      "b" 'python-black-buffer
      "t" '(:ignore t :which-key "Tests")
      "tt" 'python-pytest
@@ -651,6 +665,7 @@ https://ww.com/blog/my-emacs-config/
      "vs" 'pyenv-mode-set
      "x" '(:ignore t :which-key "Text")
      "xs" 'yas-insert-snippet
+     "a" 'helm-lsp-code-actions
      )
   #+END_SRC
 *** EIN 
@@ -659,6 +674,9 @@ https://ww.com/blog/my-emacs-config/
      (setq ein:output-area-inlined-images t)
      (setq ein:jupyter-default-notebook-directory "~/")
 
+     (use-package elpy
+       :init
+       (elpy-enable))
      (add-hook 'ein:notebook-mode-hook 'elpy-enable)
 
      (general-define-key
@@ -686,75 +704,41 @@ https://ww.com/blog/my-emacs-config/
 ** Scala 
    [[https://scalameta.org/metals/docs/editors/emacs.html][Emacs · Metals]] 
    #+BEGIN_SRC emacs-lisp
-;; Enable scala-mode for highlighting, indentation and motion commands
-(use-package scala-mode
-  :mode "\\.s\\(cala\\|bt\\)$")
+	;; Enable scala-mode for highlighting, indentation and motion commands
+     (use-package scala-mode
+       :mode "\\.s\\(cala\\|bt\\)$")
 
-;; Enable sbt mode for executing sbt commands
-(use-package sbt-mode
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false"))
-)
+     ;; Enable sbt mode for executing sbt commands
+     (use-package sbt-mode
+       :commands sbt-start sbt-command
+       :config
+       ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+       ;; allows using SPACE when in the minibuffer
+       (substitute-key-definition
+        'minibuffer-complete-word
+        'self-insert-command
+        minibuffer-local-completion-map)
+        ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+        (setq sbt:program-options '("-Dsbt.supershell=false"))
+     )
 
-;; Enable nice rendering of diagnostics like compile errors.
-(use-package flycheck
-  :init (global-flycheck-mode))
+     ;; Add metals backend for lsp-mode
+     (use-package lsp-metals)
 
-(use-package lsp-mode
-  ;; Optional - enable lsp-mode automatically in scala files
-  :hook  (scala-mode . lsp)
-         (lsp-mode . lsp-lens-mode)
-  :config (setq lsp-prefer-flymake nil))
+     ;; Add company-lsp backend for metals
+     (use-package company-lsp)
 
-;; Add metals backend for lsp-mode
-(use-package lsp-metals)
+     ;; Use the Debug Adapter Protocol for running tests and debugging
+     (use-package posframe
+       ;; Posframe is a pop-up tool that must be manually installed for dap-mode
+       )
 
-;; Enable nice rendering of documentation on hover
-(use-package lsp-ui)
-
-;; lsp-mode supports snippets, but in order for them to work you need to use yasnippet
-;; If you don't want to use snippets set lsp-enable-snippet to nil in your lsp-mode settings
-;;   to avoid odd behavior with snippets and indentation
-(use-package yasnippet)
-
-;; Add company-lsp backend for metals
-(use-package company-lsp)
-
-;; Use the Debug Adapter Protocol for running tests and debugging
-(use-package posframe
-  ;; Posframe is a pop-up tool that must be manually installed for dap-mode
-  )
-(use-package dap-mode
-  :hook
-  (lsp-mode . dap-mode)
-  (lsp-mode . dap-ui-mode)
-  )
-
-;; Use the Tree View Protocol for viewing the project structure and triggering compilation
-(use-package lsp-treemacs
-  :config
-  ;; (lsp-metals-treeview-enable t)
-  (setq lsp-metals-treeview-show-when-views-received t)
-  )
    #+END_SRC
-
 ** Java
    #+BEGIN_SRC emacs-lisp
-(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
-(use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
-(use-package dap-java :ensure nil)
+     (use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+     (use-package dap-java :ensure nil)
    #+END_SRC
-
-   #+RESULTS:
-
 * Left over
   #+BEGIN_SRC emacs-lisp
     (general-def
@@ -768,12 +752,7 @@ https://ww.com/blog/my-emacs-config/
 	)
       )
     (add-hook 'fundamental-mode-hook 'normal-mode) 
-    ;; Does not work
-    ;; (add-hook 'messages-buffer-mode-hook 'normal-mode)
   #+END_SRC
-
-  #+RESULTS:
-  | normal-mode |
 * Other/Testing
   #+BEGIN_SRC emacs-lisp
   #+END_SRC
