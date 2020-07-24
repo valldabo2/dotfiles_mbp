@@ -1,6 +1,9 @@
 Inspiration
 https://ww.com/blog/my-emacs-config/
 
+Make searchable on osx spotlight
+https://github.com/Homebrew/legacy-homebrew/issues/4635
+
 * TODO
   https://github.com/alphapapa/org-rifle
   https://github.com/spotify/dockerfile-mode
@@ -224,6 +227,26 @@ https://ww.com/blog/my-emacs-config/
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package powerline :config (powerline-default-theme))
+
+    (setq powerline-color1 "#073642")
+    (setq powerline-color2 "#002b36")
+
+    (set-face-attribute 'mode-line nil
+			:foreground "#fdf6e3"
+			:background "#2aa198"
+			:box nil)
+    (set-face-attribute 'mode-line-inactive nil
+			:box nil)
+
+    ;; (setq powerline-color1 "#657b83")
+    ;; (setq powerline-color2 "#839496")
+
+    ;; (set-face-attribute 'mode-line nil
+    ;; 		    :foreground "#fdf6e3"
+    ;; 		    :background "#859900"
+    ;; 		    :box nil)
+    ;; (set-face-attribute 'mode-line-inactive nil
+    ;; 		    :box nil)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package dashboard 
@@ -473,11 +496,14 @@ https://ww.com/blog/my-emacs-config/
      (setq org-capture-templates '(
 				   ("t" "todo" entry
 				    (file "~/Dropbox/org/gtd/inbox.org")
-				    "* TODO %?
-       %U
-       %a
-     " :clock-in t :clock-resume t)
-				   ))
+				    "* TODO %? \n  %U \n  %a"
+				    )
+				   ("m" "meeting" entry
+				    (file "~/Dropbox/org/gtd/inbox.org")
+				    "* MEETING with %? :MEETING: \n  %U"
+				    )
+				   )
+	   )
 
      (setq org-agenda-files '("~/Dropbox/org/gtd/inbox.org"
 			      "~/Dropbox/org/gtd/gtd.org"
