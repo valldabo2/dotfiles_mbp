@@ -188,6 +188,9 @@ https://ww.com/blog/my-emacs-config/
        (add-hook hook (lambda () (flyspell-mode 1))))
 
      (setq buffer-save-without-query t)
+
+     ;; https://www.emacswiki.org/emacs/TrampMode#toc25
+     (setq tramp-default-method "ssh")
    #+END_SRC
 * Useful packages 
   #+BEGIN_SRC emacs-lisp
