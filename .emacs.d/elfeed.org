@@ -1,2 +1,6 @@
 * Blogs                                                              :elfeed:
-**  https://feeds.feedburner.com/FeaturedBlogPosts-DataScienceCentral
+** [[http://feeds.feedburner.com/blogspot/gJZg][Google AI Blog]]   
+** [[https://feeds.feedburner.com/FeaturedBlogPosts-DataScienceCentral][Featured Blog Posts - Data Science Central]]   
+** [[http://news.mit.edu/rss/topic/artificial-intelligence2][MIT News - Artificial intelligence]] 
+** [[https://deepmind.com/blog/feed/basic/][Deepmind]] 
+** [[https://pandas.pydata.org/community/blog/][pandas - Python Data Analysis Library]] 

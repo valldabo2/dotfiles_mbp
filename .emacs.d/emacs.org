@@ -1,18 +1,12 @@
-Inspiration
-https://ww.com/blog/my-emacs-config/
-
 Make searchable on osx spotlight
 https://github.com/Homebrew/legacy-homebrew/issues/4635
 
 * TODO
   https://github.com/alphapapa/org-rifle
-  https://github.com/spotify/dockerfile-mode
-  https://github.com/emacs-pe/docker-tramp.el
 * Config
   #+BEGIN_SRC emacs-lisp
     (setq gc-cons-threshold 100000000)
     (setq default-directory "~/")
-
 
     (defun reload-emacs-configuration ()
       (interactive)
@@ -37,11 +31,9 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 	    ("melpa" . "https://melpa.org/packages/")
 	    ("melpa-stable" . "https://stable.melpa.org/packages/")
 	    ))
-
-    ;; (package-initialize)
-    ;; (package-refresh-contents)
+    (package-initialize)
+    (package-refresh-contents)
   #+END_SRC
-
   Use package for more compact package management
   #+BEGIN_SRC emacs-lisp
     (unless (package-installed-p 'use-package)
@@ -67,13 +59,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
 
-    (use-package solarized-theme)
-    (load-theme 'solarized-dark t)
-
-    (use-package fill-column-indicator
-      :config
-      (add-hook 'prog-mode-hook #'fci-mode)
-    )
+    (use-package solarized-theme :config (load-theme 'solarized-dark t))
+    (use-package fill-column-indicator :config (add-hook 'prog-mode-hook #'fci-mode))
   #+END_SRC
 ** Hydras 
    #+BEGIN_SRC emacs-lisp
@@ -179,21 +166,16 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 	("Q" nil)
 	)
     #+END_SRC
-* Backups
-  #+BEGIN_SRC emacs-lisp
-    (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-  #+END_SRC
 * General settings
    #+BEGIN_SRC emacs-lisp
      (global-display-line-numbers-mode)
      (global-visual-line-mode 1)
-     (set-face-attribute 'default nil :height 150)
+     (set-face-attribute 'default nil :height 135)
 
      (dolist (hook '(text-mode-hook))
        (add-hook hook (lambda () (flyspell-mode 1))))
 
      (setq buffer-save-without-query t)
-
      ;; https://www.emacswiki.org/emacs/TrampMode#toc25
      (setq tramp-default-method "ssh")
    #+END_SRC
@@ -201,14 +183,16 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
   #+BEGIN_SRC emacs-lisp
     (use-package evil
       :init
+      (setq evil-want-C-u-scroll t)
       (setq evil-want-integration t) 
       (setq evil-want-keybinding nil)
       :config (evil-mode 1)
       )
     (use-package evil-collection
       :after evil
-      :config
-      (evil-collection-init)
+      ;; Option key for evil inside minibuffer
+      :custom (evil-collection-setup-minibuffer t)
+      :init (evil-collection-init)
       )
 
     (use-package evil-escape
@@ -222,11 +206,18 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
     (use-package which-key :config (which-key-mode))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
-    (use-package helm :config (helm-mode))
+    (use-package helm
+      :config
+      (helm-mode)
+      (setq helm-mode-fuzzy-match t)
+      (setq helm-completion-in-region-fuzzy-match t)
+      (setq helm-candidate-number-limit 50)
+      )
     (use-package helm-projectile)
     (use-package helm-rg)
     (use-package helm-swoop)
   #+END_SRC
+
   #+BEGIN_SRC emacs-lisp
     (use-package powerline :config (powerline-default-theme))
 
@@ -239,16 +230,6 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 			:box nil)
     (set-face-attribute 'mode-line-inactive nil
 			:box nil)
-
-    ;; (setq powerline-color1 "#657b83")
-    ;; (setq powerline-color2 "#839496")
-
-    ;; (set-face-attribute 'mode-line nil
-    ;; 		    :foreground "#fdf6e3"
-    ;; 		    :background "#859900"
-    ;; 		    :box nil)
-    ;; (set-face-attribute 'mode-line-inactive nil
-    ;; 		    :box nil)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package dashboard 
@@ -274,10 +255,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
     (use-package ace-jump-mode)
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :config
-      (add-hook 'after-init-hook 'global-company-mode)
-      )
+    (use-package company :config (add-hook 'after-init-hook 'global-company-mode))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package ace-link :config (ace-link-setup-default))
@@ -288,6 +266,12 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
   #+BEGIN_SRC emacs-lisp
     (use-package rainbow-delimiters)
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+
+    (use-package smartparens
+      :config
+      (require 'smartparens-config)
+      (smartparens-global-mode t)
+      )
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
     (use-package winum :config (winum-mode))
@@ -353,6 +337,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    :prefix "SPC"
 
    "" nil
+   "u" 'universal-argument
    "m" '(:ignore t :which-key "Major")
 
    "TAB" '(evil-switch-to-windows-last-buffer :which-key "Last Buffer")
@@ -400,6 +385,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    "jw" 'ace-jump-word-mode 
 
    "g" '(:ignore t :which-key "Git")
+   "gb" 'magit-branch-checkout
    "gs" 'magit-status
 
 
@@ -417,6 +403,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    "cl" 'evilnc-comment-or-uncomment-lines
 
    "w" '(:ignore t :which-key "Windows")
+   "wo" 'delete-other-windows
    "wd" 'delete-window
    "wh" 'split-window-horizontally
    "wv" 'split-window-vertically
@@ -469,6 +456,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 ** Org mode 
    #+BEGIN_SRC emacs-lisp
      (use-package org-cliplink)
+     (use-package helm-org-rifle)
 
      (general-define-key
       :states '(normal visual emacs)
@@ -484,7 +472,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "t" 'org-toggle-link-display
       "tL" 'org-latex-preview
       "j" '(:ignore t :which-key "Jump")
-      "ji" 'helm-org-in-buffer-headings
+      "ji" 'helm-org-rifle-current-buffer
       "'" 'org-edit-special
       )
      (general-define-key
@@ -569,14 +557,14 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    #+END_SRC
 ** Plantuml
    #+BEGIN_SRC emacs-lisp
-   (use-package plantuml-mode
-   :config
-   (setq plantuml-jar-path "~/plantuml.jar")
-   (setq plantuml-default-exec-mode 'jar)
-   (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
-   (plantuml-enable-debug)
-   (setq plantuml-output-type "png")
-   )
+     (use-package plantuml-mode
+       :config
+       (setq plantuml-jar-path "~/plantuml.jar")
+       (setq plantuml-default-exec-mode 'jar)
+       (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+       (plantuml-enable-debug)
+       (setq plantuml-output-type "png")
+     )
    #+END_SRC
 ** Snippets
    #+BEGIN_SRC emacs-lisp
@@ -607,7 +595,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 	      (scala-mode . lsp)
 	      (sh-mode . lsp)
 	      (lsp-mode . lsp-enable-which-key-integration)
-	      (lsp-mode . lsp-ui-mode)
+	      ;; Enables doc on hover
+	      ;; (lsp-mode . lsp-ui-mode)
 	      ) 
        :commands lsp
        :config
@@ -629,26 +618,27 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
        :after lsp-mode
        :hook
        (lsp-mode . dap-mode)
-       (lsp-mode . dap-ui-mode)
+       :config
+       (setq dap-auto-configure-features nil)
+       ;; (dap-ui-mode 0)
        )
      (require 'dap-python)
 
-     (add-hook 'dap-stopped-hook
-	       (lambda (arg) (call-interactively #'dap-hydra)))
+     (add-hook 'dap-stopped-hook (lambda (arg) (call-interactively #'dap-hydra)))
    #+END_SRC
+
 ** Python
   #+BEGIN_SRC emacs-lisp
     ;; https://emacs-lsp.github.io/lsp-python-ms/
     (use-package lsp-python-ms
       :ensure t
       :init (setq lsp-python-ms-auto-install-server t)
-      :hook (python-mode . (lambda ()
-			      (require 'lsp-python-ms)
-			      (lsp))))  ; or lsp-deferred
+      :hook
+      (python-mode . (lambda () (require 'lsp-python-ms)(lsp)))
+      )
 
     ;; (setf (lsp-session-folders-blacklist (lsp-session)) nil)
     ;; (lsp--persist-session (lsp-session))
-
     (use-package pyenv-mode)
     (use-package importmagic
       :config
@@ -682,6 +672,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
      "tt" 'python-pytest
      "tf" 'python-pytest-function
      "t." 'python-pytest-popup
+     "tr" 'python-pytest-repeat
      "r" '(:ignore t :which-key "Run")
      "rr" 'quickrun
      "ra" 'quickrun-with-arg
@@ -736,39 +727,35 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    [[https://scalameta.org/metals/docs/editors/emacs.html][Emacs · Metals]] 
    #+BEGIN_SRC emacs-lisp
 	;; Enable scala-mode for highlighting, indentation and motion commands
-     (use-package scala-mode
-       :mode "\\.s\\(cala\\|bt\\)$")
+     ;; (use-package scala-mode :mode "\\.s\\(cala\\|bt\\)$")
 
-     ;; Enable sbt mode for executing sbt commands
-     (use-package sbt-mode
-       :commands sbt-start sbt-command
-       :config
-       ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-       ;; allows using SPACE when in the minibuffer
-       (substitute-key-definition
-        'minibuffer-complete-word
-        'self-insert-command
-        minibuffer-local-completion-map)
-        ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-        (setq sbt:program-options '("-Dsbt.supershell=false"))
-     )
+     ;; ;; Enable sbt mode for executing sbt commands
+     ;; (use-package sbt-mode
+     ;;   :commands sbt-start sbt-command
+     ;;   :config
+     ;;   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+     ;;   ;; allows using SPACE when in the minibuffer
+     ;;   (substitute-key-definition
+     ;;    'minibuffer-complete-word
+     ;;    'self-insert-command
+     ;;    minibuffer-local-completion-map)
+     ;;    ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+     ;;    (setq sbt:program-options '("-Dsbt.supershell=false"))
+     ;; )
 
-     ;; Add metals backend for lsp-mode
-     (use-package lsp-metals)
+     ;; ;; Add metals backend for lsp-mode
+     ;; (use-package lsp-metals)
 
-     ;; Add company-lsp backend for metals
-     (use-package company-lsp)
+     ;; ;; Add company-lsp backend for metals
+     ;; (use-package company-lsp)
 
-     ;; Use the Debug Adapter Protocol for running tests and debugging
-     (use-package posframe
-       ;; Posframe is a pop-up tool that must be manually installed for dap-mode
-       )
-
+     ;; ;; Use the Debug Adapter Protocol for running tests and debugging
+     ;; (use-package posframe)
    #+END_SRC
 ** Java
    #+BEGIN_SRC emacs-lisp
-     (use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
-     (use-package dap-java :ensure nil)
+     ;; (use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+     ;; (use-package dap-java :ensure nil)
    #+END_SRC
 * Left over
   #+BEGIN_SRC emacs-lisp
