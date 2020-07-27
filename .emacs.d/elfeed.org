@@ -1,6 +1,11 @@
 * Blogs                                                              :elfeed:
-** [[http://feeds.feedburner.com/blogspot/gJZg][Google AI Blog]]   
-** [[https://feeds.feedburner.com/FeaturedBlogPosts-DataScienceCentral][Featured Blog Posts - Data Science Central]]   
-** [[http://news.mit.edu/rss/topic/artificial-intelligence2][MIT News - Artificial intelligence]] 
-** [[https://deepmind.com/blog/feed/basic/][Deepmind]] 
-** [[https://pandas.pydata.org/community/blog/][pandas - Python Data Analysis Library]] 
+** News :news: 
+*** [[http://www.dn.se/nyheter/m/rss/senaste-nytt][Dagens Nyheter]]  
+*** [[http://www.svt.se/nyheter/rss.xml][SVT]] 
+*** [[https://www.economist.com/leaders/rss.xml][Economist Leaders]] 
+*** [[http://www.ft.com/rss/businesseducation][Financial Times Business Education]] 
+** Data Science :datascience:
+*** [[http://googleaiblog.blogspot.com/atom.xml][Google AI]]  
+*** [[https://feeds.feedburner.com/FeaturedBlogPosts-DataScienceCentral][Data Science Central]] 
+*** [[http://news.mit.edu/rss/topic/artificial-intelligence2][MIT AI]] 
+*** [[http://feeds.feedburner.com/kdnuggets-data-mining-analytics][KD Nuggets]] 

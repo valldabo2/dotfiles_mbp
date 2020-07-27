@@ -31,8 +31,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 	    ("melpa" . "https://melpa.org/packages/")
 	    ("melpa-stable" . "https://stable.melpa.org/packages/")
 	    ))
-    (package-initialize)
-    (package-refresh-contents)
+    ;; (package-initialize)
+    ;; (package-refresh-contents)
   #+END_SRC
   Use package for more compact package management
   #+BEGIN_SRC emacs-lisp
@@ -299,14 +299,6 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
   (use-package fzf :init (setenv "FZF_DEFAULT_COMMAND" "fd --type f"))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
-  (use-package elfeed)
-  (use-package elfeed-org
-  :config
-  (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-  )
-  #+END_SRC
-  #+BEGIN_SRC emacs-lisp
     (use-package vterm)
   #+END_SRC
 * General Keybindings
@@ -351,9 +343,9 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    "ans" 'ein:stop
    "ano" 'ein:process-find-file-callback
    "ao" '(:ignore t :which-key "Org")
-
    "aoa" 'org-agenda
-
+   "ae" 'elfeed
+   
    "f" '(:ignore t :which-key "Files")
    "fs" 'save-buffer
    "fr" 'helm-recentf
@@ -423,6 +415,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 
    "q" '(:ignore t :which-key "Quit")
    "qq" 'kill-emacs
+   
+   "t" 'treemacs
    )
 
   (general-define-key
@@ -453,6 +447,22 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "s" 'pdf-occur
       )
    #+END_SRC
+** Elfeed
+  #+BEGIN_SRC emacs-lisp
+    (use-package elfeed)
+    (use-package elfeed-org
+      :config
+      (elfeed-org)
+      (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+    )
+
+    (general-define-key
+     :states '(normal visual emacs)
+     :keymaps 'elfeed-search-mode-map
+     :prefix "SPC m"
+     "u" 'elfeed-update
+     )
+  #+END_SRC
 ** Org mode 
    #+BEGIN_SRC emacs-lisp
      (use-package org-cliplink)
@@ -474,6 +484,9 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "j" '(:ignore t :which-key "Jump")
       "ji" 'helm-org-rifle-current-buffer
       "'" 'org-edit-special
+      "s" '(:ignore t :which-key "Subtree")
+      "sn" 'org-narrow-to-subtree
+      "sN" 'widen
       )
      (general-define-key
       :keymaps 'org-agenda-mode-map
