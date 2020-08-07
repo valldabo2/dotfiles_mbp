@@ -318,13 +318,28 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 
   (general-define-key
    :states '(
-				    emacs
-				    hybrid
-				    normal
-				    visual
-				    motion
-				    operator
-				    replace)
+	     emacs
+	     hybrid
+	     normal
+	     visual
+	     motion
+	     operator
+	     replace)
+  :keymaps 'override
+  "C-+" 'text-scale-increase
+  "C--" 'text-scale-decrease
+  "C-0" 'text-scale-adjust
+  )
+
+  (general-define-key
+   :states '( 
+	     emacs
+	     hybrid
+	     normal
+	     visual
+	     motion
+	     operator
+	     replace)
   :keymaps 'override
    :prefix "SPC"
 
@@ -344,14 +359,19 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
    "ano" 'ein:process-find-file-callback
    "ao" '(:ignore t :which-key "Org")
    "aoa" 'org-agenda
+   "aoc" 'org-capture
    "ae" 'elfeed
-   
-   "f" '(:ignore t :which-key "Files")
+   "ar" '(:ignore t :which-key "Roam")
+   "arc" 'org-roam-capture
+   "arf" 'org-roam-find-file
+
+   "f" '(:ignore t :which-key "Files/Frames")
    "fs" 'save-buffer
    "fr" 'helm-recentf
    "ff" 'helm-find-files
    "fF" 'fzf-directory
    "fS" 'save-some-buffers
+   "fd" 'delete-frame
 
    "x" '(:ignore t :which-key "Text")
    "xa" 'text-scale-adjust
@@ -415,7 +435,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 
    "q" '(:ignore t :which-key "Quit")
    "qq" 'kill-emacs
-   
+
    "t" 'treemacs
    )
 
@@ -480,6 +500,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "lI" 'org-cliplink
       "t" '(:ignore t :which-key "Toggle")
       "t" 'org-toggle-link-display
+      "T" 'org-todo
       "tL" 'org-latex-preview
       "j" '(:ignore t :which-key "Jump")
       "ji" 'helm-org-rifle-current-buffer
@@ -487,6 +508,8 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "s" '(:ignore t :which-key "Subtree")
       "sn" 'org-narrow-to-subtree
       "sN" 'widen
+      "d" '(:ignore t :which-key "Dates")
+      "ds" 'org-schedule
       )
      (general-define-key
       :keymaps 'org-agenda-mode-map
@@ -505,6 +528,12 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
 				    (file "~/Dropbox/org/gtd/inbox.org")
 				    "* MEETING with %? :MEETING: \n  %U"
 				    )
+				   ("n" "note" entry
+				    (file "~/Dropbox/org/gtd/inbox.org")
+				    "* Note %?\n  %U"
+				    )
+				   ("j" "Journal entry" entry (function org-journal-find-location)
+				    "* %(format-time-string org-journal-time-format)%^{Title}\n%(insert )%?")
 				   )
 	   )
 
@@ -515,11 +544,36 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
      (setq org-refile-targets '((nil :maxlevel . 9)
 				(org-agenda-files :maxlevel . 9)
 				("~/Dropbox/org/gtd/archive.org" :maxlevel . 1)))
-
+     ;; https://emacs.stackexchange.com/questions/51057/use-helm-for-org-refile-completion?rq=1
+     (setq org-refile-use-outline-path 'file)
+     (setq org-outline-path-complete-in-steps nil)
+     (setq org-refile-allow-creating-parent-nodes 'confirm)
 
      (setq org-agenda-custom-commands
 	   '(("A" todo "DONE"))
 	   )
+
+     (use-package org-roam
+	   :hook
+	   (after-init . org-roam-mode)
+	   :custom
+	   (org-roam-directory "~/Dropbox/org/roam/")
+	   )
+
+
+     (use-package org-journal
+       :config
+       (setq org-journal-dir "~/Dropbox/org/journal/")
+       (setq org-journal-file-type 'daily)
+       )
+
+     (defun org-journal-find-location ()
+       ;; Open today's journal, but specify a non-nil prefix argument in order to
+       ;; inhibit inserting the heading; org-capture will insert the heading.
+       (org-journal-new-entry t)
+       ;; Position point on the journal's top-level heading so that org-capture
+       ;; will add the new entry as a child entry.
+       (goto-char (point-min)))
    #+END_SRC
    #+BEGIN_SRC emacs-lisp
      (use-package evil-org
@@ -527,10 +581,10 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
        :config
        ;; https://github.com/Somelauw/evil-org-mode
        ;; Uses evil-collection
-       ;; (add-hook 'org-mode-hook 'evil-org-mode)
-       ;; (add-hook 'evil-org-mode-hook
-       ;; 		 (lambda ()
-       ;; 		   (evil-org-set-key-theme)))
+       (add-hook 'org-mode-hook 'evil-org-mode)
+       (add-hook 'evil-org-mode-hook
+		 (lambda ()
+		   (evil-org-set-key-theme)))
        (require 'evil-org-agenda)
        (evil-org-agenda-set-keys)
        )
