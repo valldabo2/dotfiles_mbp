@@ -13,9 +13,9 @@ export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib
 
 export TERM="xterm-256color"
 
-export http_proxy=http://localhost:3128
-export https_proxy=http://localhost:3128
+export http_proxy=localhost:3128
+export https_proxy=localhost:3128
 export no_proxy=.intranet.ing.net,localhost,127.0.0.1
-export all_proxy=http://localhost:3128
+export all_proxy=localhost:3128
 
 export PIP_TRUSTED_HOST=pypi.org
