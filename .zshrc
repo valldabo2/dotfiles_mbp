@@ -150,3 +150,12 @@ eval "$(pyenv virtualenv-init - zsh)"
 # For pdf-tools in spacemacs
 # https://github.com/politza/pdf-tools
 # export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+
+
+alias swiftxcode="swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig"
+alias swiftbuild='swift build -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
+alias swifttest='swift test -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
+
+#export PYTHON_LOADER_LOGGING=1
+#export PYTHON_LIBRARY="~/.pyenv/versions/rlinabox/bin/python3.8"
+#export PATH=/Library/Developer/Toolchains/swift-latest/usr/bin:"${PATH}"

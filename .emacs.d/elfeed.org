@@ -4,6 +4,7 @@
 *** [[http://www.svt.se/nyheter/rss.xml][SVT]] 
 *** [[https://www.economist.com/leaders/rss.xml][Economist Leaders]] 
 *** [[http://www.ft.com/rss/businesseducation][Financial Times Business Education]] 
+*** [[https://fivethirtyeight.com/all/feed][FiveThirtyEight]] 
 ** Data Science :datascience:
 *** [[http://googleaiblog.blogspot.com/atom.xml][Google AI]]  
 *** [[https://feeds.feedburner.com/FeaturedBlogPosts-DataScienceCentral][Data Science Central]] 
