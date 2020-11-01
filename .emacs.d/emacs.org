@@ -233,10 +233,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       (setq helm-completion-in-region-fuzzy-match t)
       (setq helm-candidate-number-limit 50)
       )
-    (general-define-key
-     :keymaps 'helm-map
-     "TAB" 'helm-execute-persistent-action
-     )
+    
     (use-package helm-projectile)
     (use-package helm-rg)
     (use-package helm-swoop)
@@ -323,7 +320,7 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
   (use-package fzf :init (setenv "FZF_DEFAULT_COMMAND" "fd --type f"))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp
-    (use-package vterm)
+    ;; (use-package vterm)
   #+END_SRC
 * General Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -489,6 +486,9 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       :prefix "SPC m"
       "f" 'pdf-view-fit-height-to-window
       "s" 'pdf-occur
+      "n" 'org-noter
+      "q" 'org-noter-kill-session
+      "N" 'org-noter-insert-note
       )
    #+END_SRC
 ** Elfeed
@@ -525,9 +525,10 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
       "l" '(:ignore t :which-key "Links")
       "li" 'org-insert-link
       "lI" 'org-cliplink
-      "t" '(:ignore t :which-key "Toggle")
+      "t" '(:ignore t :which-key "Toggle/Timestamp")
       "t" 'org-toggle-link-display
       "T" 'org-todo
+      "n" 'org-timestamp
       "tL" 'org-latex-preview
       "j" '(:ignore t :which-key "Jump")
       "ji" 'helm-org-rifle-current-buffer
@@ -630,11 +631,12 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
      (use-package org-pdftools)
      (org-pdftools-setup-link)
 
-     (use-package org-noter-pdftools
-       :after org-noter
-       :config
-       (with-eval-after-load 'pdf-annot
-	 (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+     ;; Gives error of link when inserting note
+     ;; (use-package org-noter-pdftools
+     ;;   :after org-noter
+     ;;   :config
+     ;;   (with-eval-after-load 'pdf-annot
+     ;; 	 (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
      (use-package helm-org)
      (add-to-list 'helm-completing-read-handlers-alist '(org-capture . helm-org-completing-read-tags))
@@ -872,4 +874,10 @@ https://github.com/Homebrew/legacy-homebrew/issues/4635
   #+END_SRC
 * Other/Testing
   #+BEGIN_SRC emacs-lisp
+    (general-define-key
+     :keymaps 'helm-map
+     "TAB" 'helm-execute-persistent-action
+    )
   #+END_SRC
+
+  #+RESULTS:
