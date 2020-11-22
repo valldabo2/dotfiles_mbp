@@ -159,3 +159,7 @@ alias swifttest='swift test -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.1
 #export PYTHON_LOADER_LOGGING=1
 #export PYTHON_LIBRARY="~/.pyenv/versions/rlinabox/bin/python3.8"
 #export PATH=/Library/Developer/Toolchains/swift-latest/usr/bin:"${PATH}"
+
+export GOPATH=$HOME/go
+export GOROOT="$(brew --prefix golang)/libexec"
+export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
