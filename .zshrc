@@ -139,11 +139,11 @@ source $ZSH/oh-my-zsh.sh
 # fi
 # unset __conda_setup
 # # <<< conda initialize <<<
-
-# export PATH="$HOME/.jenv/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
 
-# export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
+export PATH="/Users/bd92eu/.pyenv/bin:$PATH"
 eval "$(pyenv init - zsh)"
 eval "$(pyenv virtualenv-init - zsh)"
 
@@ -163,3 +163,11 @@ alias swifttest='swift test -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.1
 export GOPATH=$HOME/go
 export GOROOT="$(brew --prefix golang)/libexec"
 export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
+
+
+export PATH="$HOME/.cargo/bin:$PATH"
+export PYTHON_LOADER_LOGGING=1
+export PYTHON_LIBRARY="~/.pyenv/versions/miniconda3-latest/lib/libpython3.6m.a" #"~/anaconda3/lib/libpython3.7m.so"
+
+# pdftex
+export PATH="/Library/TeX/texbin:$PATH"
