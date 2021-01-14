@@ -3,6 +3,7 @@ alias emacsclient="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacsclient -c ~/Dro
 alias emacsdaemonstart="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacs --daemon"
 alias emacsdaemonkill="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacsclient -e '(save-buffers-kill-emacs)'"
 
+alias dc="docker-compose"
 # export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
@@ -21,7 +22,8 @@ alias emacsdaemonkill="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacsclient -e '
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 # ZSH_THEME="robbyrussell"
-ZSH_THEME="powerlevel9k/powerlevel9k"
+# ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 POWERLEVEL9K_MODE='nerdfont-complete'
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(virtualenv dir vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time vi_mode)
@@ -97,7 +99,7 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=60'
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git vi-mode git-flow zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf)
+plugins=(git vi-mode git-flow zsh-autosuggestions zsh-syntax-highlighting zsh-completions fzf k)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -155,9 +157,9 @@ eval "$(pyenv virtualenv-init - zsh)"
 # export PKG_CONFIG_PATH=/usr/local/Cellar/zlib/1.2.8/lib/pkgconfig:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
 
 
-alias swiftxcode="swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig"
-alias swiftbuild='swift build -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
-alias swifttest='swift test -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
+# alias swiftxcode="swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig"
+# alias swiftbuild='swift build -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
+# alias swifttest='swift test -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx10.15"'
 
 #export PYTHON_LOADER_LOGGING=1
 #export PYTHON_LIBRARY="~/.pyenv/versions/rlinabox/bin/python3.8"
@@ -174,3 +176,4 @@ export PYTHON_LIBRARY="~/.pyenv/versions/miniconda3-latest/lib/libpython3.6m.a" 
 
 # pdftex
 export PATH="/Library/TeX/texbin:$PATH"
+
