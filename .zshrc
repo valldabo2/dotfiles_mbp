@@ -11,6 +11,7 @@ alias emacsdaemonstart="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacs --daemon"
 alias emacsdaemonkill="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacsclient -e '(save-buffers-kill-emacs)'"
 
 alias dc="docker-compose"
+alias k="k -h"
 # export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
