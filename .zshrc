@@ -11,12 +11,17 @@ alias emacsdaemonstart="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacs --daemon"
 alias emacsdaemonkill="/usr/local/Cellar/emacs-plus@27/27.1/bin/emacsclient -e '(save-buffers-kill-emacs)'"
 
 alias dc="docker-compose"
-alias k="k -h"
+# alias k="k -h"
 # export TERM="xterm-256color"
 
 #Inserted in bash when laptop received
 # export http_proxy=localhost:3128
 # export https_proxy=localhost:3128
+
+export http_proxy="http://localhost:3128"
+export https_proxy="http://localhost:3128"
+export no_proxy=".intranet.ing.net,localhost,127.0.0.1"
+export all_proxy="http://localhost:3128"
 
 
 # If you come from bash you might have to change your $PATH.
